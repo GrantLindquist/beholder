@@ -12,10 +12,12 @@ import CampaignList from '@/components/CampaignList';
 import { doc, getDoc, setDoc } from '@firebase/firestore';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import 'tailwindcss/tailwind.css';
+import { CampaignType } from '@/types/GameBoardTypes';
 
 export default function Home() {
   const [user] = useAuthState(auth);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
 
   const handleSignIn = () => {
     const provider = new GoogleAuthProvider();
@@ -37,10 +39,10 @@ export default function Home() {
   };
 
   const fetchCampaigns = async (user_id: string) => {
-    let campaigns = [];
+    let campaigns: CampaignType[] = [];
 
     if (user) {
-      const docRef = doc(db, 'users', user.uid);
+      const docRef = doc(db, 'users', user_id);
       const docSnap = await getDoc(docRef);
       const campaign_ids = _.get(docSnap.data(), 'campaigns', []);
 
@@ -49,7 +51,13 @@ export default function Home() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          campaigns.push(docSnap.data());
+          campaigns.push({
+            id: docSnap.id,
+            title: docSnap.data().title,
+            board_ids: docSnap.data().board_ids,
+            dm_id: docSnap.data().dm_id,
+            player_ids: docSnap.data().player_ids,
+          });
         } else {
           console.error(
             'Encountered issue while trying to load campaign of id: ' + id

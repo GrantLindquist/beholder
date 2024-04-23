@@ -1,4 +1,6 @@
-export interface GameBoardTypes {
+export interface GameBoardType {
+  id: string;
+  title: string;
   width: number;
   height: number;
   cells: GameBoardCellType[];
@@ -6,4 +8,12 @@ export interface GameBoardTypes {
 
 export interface GameBoardCellType {
   occupants: string[];
+}
+
+export interface CampaignType {
+  id: string;
+  title: string;
+  board_ids: string[];
+  dm_id: string;
+  player_ids: string[];
 }
