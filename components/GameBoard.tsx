@@ -8,9 +8,13 @@ import { CELL_SIZE } from '@/app/globals';
 import { Grid } from '@mui/material';
 import GameBoardCell from '@/components/GameBoardCell';
 import _ from 'lodash';
+import { Button } from '@/components/ui/button';
+import { useCampaign } from '@/hooks/useCampaign';
 
 const GameBoard = (props: { scale: number; boardIds: string[] }) => {
   const [board, setBoard] = useState<GameBoardType | null>(null);
+  const { isUserDm } = useCampaign();
+  console.log('is dm: ' + isUserDm);
 
   // Subscribe to receive live board updates
   // TODO: Add support for multiple boards
@@ -54,7 +58,10 @@ const GameBoard = (props: { scale: number; boardIds: string[] }) => {
           )}
         </Grid>
       ) : (
-        <p>There are no boards! Create one loser.</p>
+        <>
+          <p>There are active boards for this campaign.</p>
+          {isUserDm && <Button variant="outline">Create Board</Button>}
+        </>
       )}
     </>
   );

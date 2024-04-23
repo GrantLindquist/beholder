@@ -1,16 +1,28 @@
+'use client';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import _ from 'lodash';
 import Link from 'next/link';
+import { useCampaign } from '@/hooks/useCampaign';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/app/firebase';
 
 const CampaignList = (props: { campaigns: any[] }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const { enterCampaign } = useCampaign();
+  const [user] = useAuthState(auth);
 
   return (
     <div className="max-w-5xl mx-auto px-8">
       <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10">
         {_.map(props.campaigns, (campaign, index) => (
-          <Link href={`/${campaign.id}`} key={index}>
+          <Link
+            href={`/${campaign.id}`}
+            key={index}
+            onClick={() => enterCampaign(campaign, _.get(user, 'uid', ''))}
+          >
             <div
               className="relative group  block p-2 h-full w-full "
               onMouseEnter={() => setHoveredIndex(index)}
