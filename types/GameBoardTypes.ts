@@ -8,6 +8,7 @@ export interface GameBoardType {
 
 export interface GameBoardCellType {
   occupants: string[];
+  is_disabled?: boolean;
 }
 
 export interface CampaignType {

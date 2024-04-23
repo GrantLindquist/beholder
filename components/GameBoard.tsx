@@ -8,59 +8,52 @@ import { CELL_SIZE } from '@/app/globals';
 import { Grid } from '@mui/material';
 import GameBoardCell from '@/components/GameBoardCell';
 import _ from 'lodash';
-import { Button } from '@/components/ui/button';
 import { useCampaign } from '@/hooks/useCampaign';
 
-const GameBoard = (props: { scale: number; boardIds: string[] }) => {
-  const [board, setBoard] = useState<GameBoardType | null>(null);
-  const { isUserDm } = useCampaign();
-  console.log('is dm: ' + isUserDm);
+const GameBoard = (props: { scale: number; boardId: string }) => {
+  const [board, setBoard] = useState<GameBoardType>();
+  const { campaign } = useCampaign();
 
   // Subscribe to receive live board updates
-  // TODO: Add support for multiple boards
   useEffect(() => {
-    if (_.size(props.boardIds) > 0) {
-      const docRef = doc(db, 'game_boards', props.boardIds[0]);
-      const unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setBoard(docSnap.data() as GameBoardType);
-        } else {
-          console.log('No such document!');
-        }
-      });
-      // Cleanup
-      return () => {
-        unsubscribe();
-      };
-    }
-  }, [props.boardIds]);
+    const docRef = doc(db, 'game_boards', props.boardId);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setBoard(docSnap.data() as GameBoardType);
+      } else {
+        console.error('The queried board does not exist.');
+      }
+    });
+    // Cleanup
+    return () => {
+      unsubscribe();
+    };
+  }, [props.boardId]);
 
   return (
     <>
-      {board ? (
-        <Grid
-          id="game_board"
-          maxWidth={board.width * CELL_SIZE}
-          container
-          columns={board.width}
-          sx={{
-            overflow: 'auto',
-            transform: `scale(${props.scale})`,
-          }}
-        >
-          {_.map(
-            Object.entries(_.get(board, 'cells')),
-            (cell: GameBoardCellType, index: number) => (
-              <Grid item key={index} xs={1}>
-                <GameBoardCell cell={cell} />
-              </Grid>
-            )
-          )}
-        </Grid>
-      ) : (
+      {board && (
         <>
-          <p>There are active boards for this campaign.</p>
-          {isUserDm && <Button variant="outline">Create Board</Button>}
+          <h1>{_.get(campaign, 'title')}</h1>
+          <Grid
+            id="game_board"
+            maxWidth={board.width * CELL_SIZE}
+            container
+            columns={board.width}
+            sx={{
+              overflow: 'auto',
+              transform: `scale(${props.scale})`,
+            }}
+          >
+            {_.map(
+              Object.entries(_.get(board, 'cells')),
+              (cell: GameBoardCellType, index: number) => (
+                <Grid item key={index} xs={1}>
+                  <GameBoardCell cell={cell} />
+                </Grid>
+              )
+            )}
+          </Grid>
         </>
       )}
     </>
