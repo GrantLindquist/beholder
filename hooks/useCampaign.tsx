@@ -9,7 +9,7 @@ const CampaignContext = createContext<{
   isUserDm: boolean | null;
 }>({
   campaign: null,
-  enterCampaign: (campaign: CampaignType, userId: string) =>
+  enterCampaign: (_campaign: CampaignType, _userId: string) =>
     console.error('Failed to initialize enterCampaign'),
   isUserDm: null,
 });
