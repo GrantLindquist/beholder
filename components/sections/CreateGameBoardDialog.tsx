@@ -25,10 +25,16 @@ const CreateGameBoardDialog = () => {
     const height = event.target[1].value;
     // @ts-ignore
     const width = event.target[2].value;
+
     const cells: GameBoardCellType[] = [];
+    for (let i = 0; i < height * width; i++) {
+      cells.push({
+        occupants: [],
+      });
+    }
 
     const newBoard: GameBoardType = {
-      id: 'e',
+      id: Date.now().toString(36) + Math.random().toString(36).substring(2),
       title: title,
       height: height,
       width: width,
@@ -68,7 +74,7 @@ const CreateGameBoardDialog = () => {
                 <input type="number" className="input input-bordered" />
               </div>
               <Button type="submit" variant={'outline'}>
-                Search
+                Create
               </Button>
             </form>
           </DialogDescription>

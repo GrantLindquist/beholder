@@ -4,25 +4,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import _ from 'lodash';
 import Link from 'next/link';
-import { useCampaign } from '@/hooks/useCampaign';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/app/firebase';
 
-const CampaignList = (props: { campaigns: any[] }) => {
+const CampaignList = (props: { campaignIds: string[] }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  const { enterCampaign } = useCampaign();
-  const [user] = useAuthState(auth);
 
   return (
     <div className="max-w-5xl mx-auto px-8">
       <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10">
-        {_.map(props.campaigns, (campaign, index) => (
-          <Link
-            href={`/${campaign.id}`}
-            key={index}
-            onClick={() => enterCampaign(campaign, _.get(user, 'uid', ''))}
-          >
+        {_.map(props.campaignIds, (campaignId, index) => (
+          <Link href={`/${campaignId}`} key={index}>
             <div
               className="relative group  block p-2 h-full w-full "
               onMouseEnter={() => setHoveredIndex(index)}
@@ -48,11 +38,12 @@ const CampaignList = (props: { campaigns: any[] }) => {
                   />
                 )}
               </AnimatePresence>
+              {/* TODO: Make campaignId return a CampaignPreview object */}
               <div className=" rounded-2xl h-full w-full p-4 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-800/[0.2] border border-transparent group-hover:border-slate-700 relative z-50">
                 <div className="relative z-50">
                   <div className="p-4">
                     <h4 className="text-zinc-100 font-bold tracking-wide mt-4">
-                      {campaign.title}
+                      {campaignId}
                     </h4>
                     <p className="mt-8 text-zinc-400 tracking-wide leading-relaxed text-sm">
                       This is a description. Here is my campaign.

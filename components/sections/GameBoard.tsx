@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import { CELL_SIZE } from '@/app/globals';
 import { Grid } from '@mui/material';
-import GameBoardCell from '@/components/GameBoardCell';
+import GameBoardCell from '@/components/sections/GameBoardCell';
 import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
 

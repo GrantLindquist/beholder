@@ -4,17 +4,27 @@ export interface GameBoardType {
   width: number;
   height: number;
   cells: GameBoardCellType[];
+  activeTokenIds: string[];
 }
 
 export interface GameBoardCellType {
   occupants: string[];
-  is_disabled?: boolean;
+  isDisabled?: boolean;
+}
+
+export interface GameBoardToken {
+  id: string;
+  image?: any;
+  size?: 'small' | 'medium' | 'large';
+  title: string;
+  ownerId: string;
+  isPlayer: boolean;
 }
 
 export interface CampaignType {
   id: string;
   title: string;
-  board_ids: string[];
-  dm_id: string;
-  player_ids: string[];
+  boardIds: string[];
+  dmId: string;
+  playerIds: string[];
 }
