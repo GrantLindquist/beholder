@@ -28,11 +28,11 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
       setCampaign({
         id: docSnap.id,
         title: docSnap.data().title,
-        boardIds: docSnap.data().board_ids,
-        dmId: docSnap.data().dm_id,
-        playerIds: docSnap.data().player_ids,
+        boardIds: docSnap.data().boardIds,
+        dmId: docSnap.data().dmId,
+        playerIds: docSnap.data().playerIds,
       });
-      userId === docSnap.data().dm_id ? setIsUserDm(true) : setIsUserDm(false);
+      userId === docSnap.data().dmId ? setIsUserDm(true) : setIsUserDm(false);
     } else {
       console.error(
         'Encountered issue while trying to load campaign of id: ' + campaignId

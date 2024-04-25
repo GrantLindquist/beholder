@@ -1,22 +1,23 @@
 'use client';
 
-import { GameBoardCellType, GameBoardType } from '@/types/GameBoardTypes';
+import { GameBoardType } from '@/types/GameBoardTypes';
 import { doc, onSnapshot } from '@firebase/firestore';
 import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import { CELL_SIZE } from '@/app/globals';
-import { Grid } from '@mui/material';
-import GameBoardCell from '@/components/sections/GameBoardCell';
+import { Box, Grid } from '@mui/material';
 import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const [board, setBoard] = useState<GameBoardType>();
+  const [isMovingToken, setIsMovingToken] = useState(false);
+
   const { campaign } = useCampaign();
 
   // Subscribe to receive live board updates
   useEffect(() => {
-    const docRef = doc(db, 'game_boards', props.boardId);
+    const docRef = doc(db, 'gameBoards', props.boardId);
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         setBoard(docSnap.data() as GameBoardType);
@@ -30,6 +31,13 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     };
   }, [props.boardId]);
 
+  const handleCellClick = () => {
+    if (isMovingToken) {
+    } else {
+    }
+  };
+
+  // TODO: Make the grid render function not suck
   return (
     <>
       {board && (
@@ -45,13 +53,31 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
               transform: `scale(${props.scale})`,
             }}
           >
-            {_.map(
-              Object.entries(_.get(board, 'cells')),
-              (cell: GameBoardCellType, index: number) => (
-                <Grid item key={index} xs={1}>
-                  <GameBoardCell cell={cell} />
+            {Array.from({ length: board.height }, (_, rowIndex) =>
+              Array.from({ length: board.width }, (_, colIndex) => (
+                <Grid item key={`${rowIndex}-${colIndex}`} xs={1}>
+                  <Box
+                    sx={{
+                      height: CELL_SIZE,
+                      width: CELL_SIZE,
+                      borderWidth: 1,
+                      borderColor: 'grey',
+                      borderStyle: 'solid',
+                    }}
+                  >
+                    {Array.from(
+                      { length: board.activeTokens.length },
+                      (_, i) =>
+                        board.activeTokens[i].boardPosition[0] === colIndex &&
+                        board.activeTokens[i].boardPosition[1] == rowIndex && (
+                          <div key={i}>
+                            <p>{board.activeTokens[i].title}</p>
+                          </div>
+                        )
+                    )}
+                  </Box>
                 </Grid>
-              )
+              ))
             )}
           </Grid>
         </>

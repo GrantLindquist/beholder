@@ -1,17 +1,13 @@
+// TODO: Investigate whether having ids in types causes db mismatch
 export interface GameBoardType {
   id: string;
   title: string;
   width: number;
   height: number;
-  cells: GameBoardCellType[];
-  activeTokenIds: string[];
+  activeTokens: GameBoardToken[];
 }
 
-export interface GameBoardCellType {
-  occupants: string[];
-  isDisabled?: boolean;
-}
-
+// TODO: Implement movedAt attribute to detect which token to display when multiple occupy a cell
 export interface GameBoardToken {
   id: string;
   image?: any;
@@ -19,6 +15,7 @@ export interface GameBoardToken {
   title: string;
   ownerId: string;
   isPlayer: boolean;
+  boardPosition: [number, number] | null;
 }
 
 export interface CampaignType {
