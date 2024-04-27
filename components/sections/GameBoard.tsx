@@ -1,7 +1,13 @@
 'use client';
 
-import { GameBoardType } from '@/types/GameBoardTypes';
-import { doc, onSnapshot } from '@firebase/firestore';
+import { ActiveGameBoardToken, GameBoardType } from '@/types/GameBoardTypes';
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from '@firebase/firestore';
 import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import _ from 'lodash';
@@ -11,7 +17,9 @@ import { CELL_SIZE } from '@/app/globals';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const [board, setBoard] = useState<GameBoardType>();
-  const [isMovingToken, setIsMovingToken] = useState(false);
+  const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
+    null
+  );
 
   const { campaign } = useCampaign();
 
@@ -32,17 +40,28 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   }, [props.boardId]);
 
   // TODO: Complete token movement
-  const handleCellClick = async (id: string, coords: [number, number]) => {
-    // if (isMovingToken) {
-    //   console.log('test');
-    //   const docRef = doc(db, 'gameBoards', props.boardId);
-    //   await updateDoc(docRef, {
-    //     activeTokens: arrayRemove(id),
-    //   });
-    //   setIsMovingToken(false);
-    // } else {
-    //   setIsMovingToken(true);
-    // }
+  const handleCellClick = async (
+    containedToken: ActiveGameBoardToken | null,
+    coords: [number, number]
+  ) => {
+    if (movingToken) {
+      const docRef = doc(db, 'gameBoards', props.boardId);
+
+      await updateDoc(docRef, {
+        activeTokens: arrayRemove(movingToken),
+      });
+
+      await updateDoc(docRef, {
+        activeTokens: arrayUnion({
+          ...movingToken,
+          boardPosition: coords,
+        }),
+      });
+
+      setMovingToken(null);
+    } else {
+      containedToken && setMovingToken(containedToken);
+    }
   };
 
   return (
@@ -50,7 +69,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
       {board && (
         <>
           <h1>{_.get(campaign, 'title')}</h1>
-          {isMovingToken && <p>moving token!</p>}
           <Grid
             id="game_board"
             maxWidth={board.width * CELL_SIZE}
@@ -79,14 +97,12 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                         borderColor: 'grey',
                         borderStyle: 'solid',
                       }}
+                      onClick={() =>
+                        handleCellClick(token || null, [colIndex, rowIndex])
+                      }
                     >
                       {token && (
-                        <div
-                          key={token.id}
-                          onClick={() =>
-                            handleCellClick(token.id, [rowIndex, colIndex])
-                          }
-                        >
+                        <div>
                           <p>{token.title}</p>
                         </div>
                       )}
