@@ -74,7 +74,10 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
         </div>
         <div className="w-full h-full flex items-center justify-center">
           {focusedBoardId ? (
-            <GameBoard scale={boardScale} boardId={focusedBoardId} />
+            <>
+              <GameBoard scale={boardScale} boardId={focusedBoardId} />
+              <CreateGameBoardDialog />
+            </>
           ) : (
             <>
               <p>There are no active boards for this campaign.</p>
@@ -106,6 +109,18 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
               </Button>
             </>
           )}
+          {_.map(boardIds, (id) => (
+            <div key={id}>
+              {focusedBoardId != id && (
+                <Button
+                  variant={'outline'}
+                  onClick={() => setFocusedBoardId(id)}
+                >
+                  {id}
+                </Button>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

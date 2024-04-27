@@ -31,8 +31,6 @@ const TokenList = (props: { boardId: string | null }) => {
           id: doc.id,
           title: doc.data().title,
           ownerId: doc.data().ownerId,
-          isPlayer: doc.data().isPlayer,
-          boardPosition: doc.data().boardPosition,
         }));
         setTokens(tokens);
       });
@@ -43,13 +41,15 @@ const TokenList = (props: { boardId: string | null }) => {
     fetchTokens();
   }, [user]);
 
-  const handlePlaceToken = async () => {
+  const handleInitToken = async () => {
     if (props.boardId && selectedToken) {
       const docRef = doc(db, 'gameBoards', props.boardId);
       await updateDoc(docRef, {
         activeTokens: arrayUnion({
           ...selectedToken,
           boardPosition: [0, 0],
+          lastMovedAt: Date.now(),
+          isPlayer: true,
         }),
       });
     }
@@ -67,7 +67,7 @@ const TokenList = (props: { boardId: string | null }) => {
         </div>
       ))}
       {selectedToken && props.boardId && (
-        <Button variant={'outline'} onClick={handlePlaceToken}>
+        <Button variant={'outline'} onClick={handleInitToken}>
           Place Token
         </Button>
       )}

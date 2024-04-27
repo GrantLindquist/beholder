@@ -51,7 +51,7 @@ const CreateGameBoardDialog = () => {
   return (
     <Dialog open={isDialogOpen}>
       <DialogTrigger onClick={() => setDialogOpen(true)}>
-        Create Board
+        Add Board
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
