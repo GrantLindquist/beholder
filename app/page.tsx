@@ -12,7 +12,6 @@ import CampaignList from '@/components/sections/CampaignList';
 import { doc, getDoc, setDoc } from '@firebase/firestore';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import 'tailwindcss/tailwind.css';
 
 export default function Home() {
   const [user] = useAuthState(auth);

@@ -32,4 +32,5 @@ export interface CampaignType extends CampaignPreview {
   boardIds: string[];
   dmId: string;
   playerIds: string[];
+  activePlayerIds?: string[];
 }

@@ -13,11 +13,14 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import _ from 'lodash';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { Button } from '@/components/ui/button';
+import GameToken from '@/components/board/GameToken';
+import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 
-const TokenList = (props: { boardId: string | null }) => {
+const TokenList = () => {
   const [user] = useAuthState(auth);
   const [tokens, setTokens] = useState<GameBoardToken[]>([]);
   const [selectedToken, setSelectedToken] = useState<GameBoardToken | null>();
+  const { focusedBoard } = useFocusedBoard();
 
   useEffect(() => {
     const fetchTokens = () => {
@@ -42,8 +45,8 @@ const TokenList = (props: { boardId: string | null }) => {
   }, [user]);
 
   const handleInitToken = async () => {
-    if (props.boardId && selectedToken) {
-      const docRef = doc(db, 'gameBoards', props.boardId);
+    if (focusedBoard && selectedToken) {
+      const docRef = doc(db, 'gameBoards', focusedBoard.id);
       await updateDoc(docRef, {
         activeTokens: arrayUnion({
           ...selectedToken,
@@ -59,14 +62,13 @@ const TokenList = (props: { boardId: string | null }) => {
     <div>
       {tokens.map((token) => (
         <div key={token.id}>
-          <div
-            className="w-10 h-10 bg-gray-500"
-            onClick={() => setSelectedToken(token)}
-          ></div>
+          <div onClick={() => setSelectedToken(token)}>
+            <GameToken token={token} />
+          </div>
           <p>{token.title}</p>
         </div>
       ))}
-      {selectedToken && props.boardId && (
+      {selectedToken && focusedBoard?.id && (
         <Button variant={'outline'} onClick={handleInitToken}>
           Place Token
         </Button>

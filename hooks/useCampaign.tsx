@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { CampaignType } from '@/types/GameBoardTypes';
-import { doc, getDoc } from '@firebase/firestore';
+import { arrayUnion, doc, getDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 
 const CampaignContext = createContext<{
@@ -21,18 +21,25 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
   const [isUserDm, setIsUserDm] = useState<boolean | null>(null);
 
   const enterCampaign = async (campaignId: string, userId: string) => {
-    const docRef = doc(db, 'campaigns', campaignId);
-    const docSnap = await getDoc(docRef);
+    const campaignDocRef = doc(db, 'campaigns', campaignId);
+    const campaignDocSnap = await getDoc(campaignDocRef);
 
-    if (docSnap.exists()) {
+    if (campaignDocSnap.exists()) {
       setCampaign({
-        id: docSnap.id,
-        title: docSnap.data().title,
-        boardIds: docSnap.data().boardIds,
-        dmId: docSnap.data().dmId,
-        playerIds: docSnap.data().playerIds,
+        id: campaignDocSnap.id,
+        title: campaignDocSnap.data().title,
+        boardIds: campaignDocSnap.data().boardIds,
+        dmId: campaignDocSnap.data().dmId,
+        playerIds: campaignDocSnap.data().playerIds,
       });
-      userId === docSnap.data().dmId ? setIsUserDm(true) : setIsUserDm(false);
+      userId === campaignDocSnap.data().dmId
+        ? setIsUserDm(true)
+        : setIsUserDm(false);
+
+      // TODO: Figure out best way to remove activePlayerIds
+      await updateDoc(campaignDocRef, {
+        activePlayerIds: arrayUnion(userId),
+      });
     } else {
       console.error(
         'Encountered issue while trying to load campaign of id: ' + campaignId

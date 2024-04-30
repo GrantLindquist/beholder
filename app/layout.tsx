@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { CampaignProvider } from '@/hooks/useCampaign';
 import { ReactNode } from 'react';
+import './globals.css';
+import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -11,20 +13,18 @@ export const metadata: Metadata = {
   description: 'D&D fun time',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider
+          disableTransitionOnChange
           attribute="class"
           defaultTheme="dark"
-          disableTransitionOnChange
         >
-          <CampaignProvider>{children}</CampaignProvider>
+          <CampaignProvider>
+            <FocusedBoardProvider>{children}</FocusedBoardProvider>
+          </CampaignProvider>
         </ThemeProvider>
       </body>
     </html>
