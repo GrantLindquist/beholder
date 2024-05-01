@@ -5,6 +5,7 @@ import { CampaignProvider } from '@/hooks/useCampaign';
 import { ReactNode } from 'react';
 import './globals.css';
 import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
+import { UserProvider } from '@/hooks/userContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,9 +23,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           attribute="class"
           defaultTheme="dark"
         >
-          <CampaignProvider>
-            <FocusedBoardProvider>{children}</FocusedBoardProvider>
-          </CampaignProvider>
+          <UserProvider>
+            <CampaignProvider>
+              <FocusedBoardProvider>{children}</FocusedBoardProvider>
+            </CampaignProvider>
+          </UserProvider>
         </ThemeProvider>
       </body>
     </html>

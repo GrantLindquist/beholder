@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   arrayRemove,
   deleteDoc,
@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
+import { getUserFromSession } from '@/utils/userSession';
+import { UserContext } from '@/hooks/userContext';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const [boardScale, setBoardScale] = useState(1);
@@ -24,6 +26,9 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
   const [user] = useAuthState(auth);
 
+  const test = useContext(UserContext);
+  console.log(test);
+
   // TODO: Use loading states while fetching promises
   useEffect(() => {
     enterCampaign(params.id, _.get(user, 'uid', ''));
@@ -31,6 +36,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     const fetchDefaultBoardId = async () => {
+      console.log(await getUserFromSession());
       if (campaign) {
         const campaignDocRef = doc(db, 'campaigns', campaign.id);
         const campaignDocSnap = await getDoc(campaignDocRef);

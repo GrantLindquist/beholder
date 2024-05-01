@@ -12,6 +12,8 @@ import CampaignList from '@/components/sections/CampaignList';
 import { doc, getDoc, setDoc } from '@firebase/firestore';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import { setUserSession } from '@/utils/userSession';
+import { UserFunctional, UserSession } from '@/types/UserTypes';
 
 export default function Home() {
   const [user] = useAuthState(auth);
@@ -22,19 +24,23 @@ export default function Home() {
     signInWithPopup(auth, provider)
       // Add user to firestore if it does not exist
       .then(async (result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-
-        console.log(credential);
-        console.log(token);
-
         const user = result.user;
+        const sessionUser: UserSession = {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          uid: user.uid,
+        };
+        await setUserSession(sessionUser);
+
         const additionalUserInfo = getAdditionalUserInfo(result);
         if (_.get(additionalUserInfo, 'isNewUser')) {
           const userDoc = doc(db, 'users', user.uid);
           await setDoc(userDoc, {
+            ...sessionUser,
+            createdAt: Date.now(),
             campaigns: [],
-          });
+          } as UserFunctional);
         }
       })
       .catch((error) => {
