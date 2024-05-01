@@ -24,7 +24,10 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
     const campaignDocRef = doc(db, 'campaigns', campaignId);
     const campaignDocSnap = await getDoc(campaignDocRef);
 
-    if (campaignDocSnap.exists()) {
+    if (
+      campaignDocSnap.exists() &&
+      campaignDocSnap.data().playerIds.includes(userId)
+    ) {
       setCampaign({
         id: campaignDocSnap.id,
         title: campaignDocSnap.data().title,

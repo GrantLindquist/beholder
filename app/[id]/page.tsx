@@ -24,7 +24,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
   const [user] = useAuthState(auth);
 
-  // Initialize campaign
+  // TODO: Use loading states while fetching promises
   useEffect(() => {
     enterCampaign(params.id, _.get(user, 'uid', ''));
   }, [params.id]);
@@ -61,46 +61,52 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   };
 
   return (
-    <div className="flex">
-      <SideNavbar />
-      <div className="w-full h-full flex items-center justify-center">
-        {focusedBoard?.id ? (
-          <>
-            <GameBoard scale={boardScale} boardId={focusedBoard.id} />
-          </>
-        ) : (
-          <>
-            <p>There are no active boards for this campaign.</p>
-            {/*{isUserDm && <CreateGameBoard />}*/}
-          </>
-        )}
-      </div>
-      <div className="w-20 h-full flex flex-col items-center">
-        {focusedBoard?.id && (
-          <>
-            {/*<SearchIcon />*/}
-            {/*<Slider*/}
-            {/*  sx={{*/}
-            {/*    height: 100,*/}
-            {/*  }}*/}
-            {/*  orientation={'vertical'}*/}
-            {/*  value={boardScale}*/}
-            {/*  onChange={handleMagnify}*/}
-            {/*  defaultValue={1}*/}
-            {/*  min={0.3}*/}
-            {/*  max={3}*/}
-            {/*  step={0.0001}*/}
-            {/*/>*/}
-            <Button
-              variant={'destructive'}
-              onClick={() => handleDeleteBoard(focusedBoard.id)}
-            >
-              Delete Board
-            </Button>
-          </>
-        )}
-      </div>
-    </div>
+    <>
+      {campaign ? (
+        <div className="flex">
+          <SideNavbar />
+          <div className="w-full h-full flex items-center justify-center">
+            {focusedBoard?.id ? (
+              <>
+                <GameBoard scale={boardScale} boardId={focusedBoard.id} />
+              </>
+            ) : (
+              <>
+                <p>There are no active boards for this campaign.</p>
+                {/*{isUserDm && <CreateGameBoard />}*/}
+              </>
+            )}
+          </div>
+          <div className="w-20 h-full flex flex-col items-center">
+            {focusedBoard?.id && (
+              <>
+                {/*<SearchIcon />*/}
+                {/*<Slider*/}
+                {/*  sx={{*/}
+                {/*    height: 100,*/}
+                {/*  }}*/}
+                {/*  orientation={'vertical'}*/}
+                {/*  value={boardScale}*/}
+                {/*  onChange={handleMagnify}*/}
+                {/*  defaultValue={1}*/}
+                {/*  min={0.3}*/}
+                {/*  max={3}*/}
+                {/*  step={0.0001}*/}
+                {/*/>*/}
+                <Button
+                  variant={'destructive'}
+                  onClick={() => handleDeleteBoard(focusedBoard.id)}
+                >
+                  Delete Board
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      ) : (
+        <p>This campaign does not exist.</p>
+      )}
+    </>
   );
 };
 export default CampaignPage;

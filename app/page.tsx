@@ -22,6 +22,12 @@ export default function Home() {
     signInWithPopup(auth, provider)
       // Add user to firestore if it does not exist
       .then(async (result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+
+        console.log(credential);
+        console.log(token);
+
         const user = result.user;
         const additionalUserInfo = getAdditionalUserInfo(result);
         if (_.get(additionalUserInfo, 'isNewUser')) {

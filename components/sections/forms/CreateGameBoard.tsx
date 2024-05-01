@@ -16,15 +16,15 @@ const CreateGameBoard = () => {
     // @ts-ignore
     const title = event.target[0].value;
     // @ts-ignore
-    const height = event.target[1].value;
-    // @ts-ignore
     const width = event.target[2].value;
+    // @ts-ignore
+    const height = event.target[3].value;
 
     const newBoard: GameBoardType = {
       id: generateUUID(),
       title: title,
-      height: height,
       width: width,
+      height: height,
       activeTokens: [],
     };
 
