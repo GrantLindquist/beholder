@@ -29,6 +29,7 @@ import CreateToken from '@/components/sections/forms/CreateToken';
 import TokenList from '@/components/sections/TokenList';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 
+// TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
   const { isUserDm, campaign } = useCampaign();
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();

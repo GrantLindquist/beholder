@@ -21,7 +21,7 @@ const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
         alt={props.token.title}
         width={CELL_SIZE}
         height={CELL_SIZE}
-      ></Image>
+      />
       {/*<p>{props.token.title}</p>*/}
     </div>
   );

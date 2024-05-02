@@ -5,6 +5,7 @@ export interface GameBoardType {
   title: string;
   width: number;
   height: number;
+  backgroundImgURL?: string;
   activeTokens: ActiveGameBoardToken[];
 }
 
@@ -14,6 +15,7 @@ export interface GameBoardToken {
   size?: 'small' | 'medium' | 'large';
   title: string;
   ownerId: string;
+  tokenImgURL?: string;
 }
 
 export interface ActiveGameBoardToken extends GameBoardToken {

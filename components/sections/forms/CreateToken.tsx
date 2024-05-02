@@ -1,63 +1,100 @@
 import { Button } from '@/components/ui/button';
-import { FormEvent, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { doc, setDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import { generateUUID } from '@/utils/uuid';
-import { uploadToS3 } from '@/utils/s3';
 import { UserContext } from '@/hooks/userContext';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createTokenSchema } from '@/types/FormSchemas';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import NextImage from 'next/image';
 
 const CreateToken = () => {
-  const [isDialogOpen, setDialogOpen] = useState(false);
   const user = useContext(UserContext).user;
+  const [imgPreview, setImgPreview] = useState<string | null>(null);
 
-  const handleCreateToken = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useForm<z.infer<typeof createTokenSchema>>({
+    resolver: zodResolver(createTokenSchema),
+    defaultValues: {
+      title: '',
+      tokenImg: undefined,
+    },
+  });
+
+  const handleCreateToken = async (
+    values: z.infer<typeof createTokenSchema>
+  ) => {
     if (!user) {
       console.error('An unauthenticated user cannot create tokens.');
       return;
     }
 
-    // @ts-ignore
-    const title = event.target[0].value;
-
-    // @ts-ignore
-    const image = event.target[1].files[0];
-    if (image) {
-      await uploadToS3(image);
-    }
-
     const newToken: GameBoardToken = {
       id: generateUUID(),
-      title: title,
+      title: values.title,
+      tokenImgURL: values.tokenImg,
       ownerId: user.uid,
     };
 
     const docRef = doc(db, 'tokens', newToken.id);
     await setDoc(docRef, newToken);
-
-    setDialogOpen(false);
   };
 
   // TODO: Accept prop can be bypassed, ensure that users can only upload png/jpeg as avatar
   return (
-    <form onSubmit={handleCreateToken}>
-      <div className="form-control">
-        <label>Title</label>
-        <input type="text" className="input input-bordered" />
-      </div>
-      <div className="form-control">
-        <label>Avatar</label>
-        <input
-          type="file"
-          accept="image/png, image/jpeg"
-          className="input input-bordered"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleCreateToken)}
+        className="space-y-1"
+      >
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="shadcn" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <Button type="submit" variant={'outline'}>
-        Create
-      </Button>
-    </form>
+        <FormField
+          control={form.control}
+          name="tokenImg"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Token Image</FormLabel>
+              <FormControl>
+                <Input placeholder="shadcn" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {imgPreview && (
+          <NextImage
+            src={imgPreview}
+            width={100}
+            height={100}
+            alt="Background Image Preview"
+          />
+        )}
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
   );
 };
 export default CreateToken;
