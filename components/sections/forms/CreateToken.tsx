@@ -1,15 +1,15 @@
 import { Button } from '@/components/ui/button';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useContext, useState } from 'react';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { doc, setDoc } from '@firebase/firestore';
-import db, { auth } from '@/app/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import db from '@/app/firebase';
 import { generateUUID } from '@/utils/uuid';
 import { uploadToS3 } from '@/utils/s3';
+import { UserContext } from '@/hooks/userContext';
 
 const CreateToken = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const [user] = useAuthState(auth);
+  const user = useContext(UserContext).user;
 
   const handleCreateToken = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

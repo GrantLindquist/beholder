@@ -4,19 +4,20 @@ import {
   getAdditionalUserInfo,
   GoogleAuthProvider,
   signInWithPopup,
+  signOut,
 } from '@firebase/auth';
 import db, { auth } from '@/app/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { Button } from '@/components/ui/button';
 import CampaignList from '@/components/sections/CampaignList';
 import { doc, getDoc, setDoc } from '@firebase/firestore';
 import _ from 'lodash';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { setUserSession } from '@/utils/userSession';
 import { UserFunctional, UserSession } from '@/types/UserTypes';
+import { UserContext } from '@/hooks/userContext';
 
 export default function Home() {
-  const [user] = useAuthState(auth);
+  const user = useContext(UserContext).user;
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
 
   const handleSignIn = () => {
@@ -48,13 +49,18 @@ export default function Home() {
       });
   };
 
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
+
   useEffect(() => {
-    const fetchCampaignIds = async (user_id: string) => {
-      const docRef = doc(db, 'users', user_id);
+    const fetchCampaignIds = async (userId: string) => {
+      const docRef = doc(db, 'users', userId);
       const docSnap = await getDoc(docRef);
       setCampaignIds(_.get(docSnap.data(), 'campaigns', []));
     };
     if (user) {
+      console.log(user);
       fetchCampaignIds(user.uid);
     }
   }, [user]);
@@ -62,7 +68,12 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {user ? (
-        <CampaignList campaignIds={campaignIds} />
+        <>
+          <CampaignList campaignIds={campaignIds} />
+          <Button variant="outline" onClick={handleSignOut}>
+            Sign-out
+          </Button>
+        </>
       ) : (
         <Button variant="outline" onClick={handleSignIn}>
           Sign-in with Google

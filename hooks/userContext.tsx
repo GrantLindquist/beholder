@@ -14,8 +14,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const user = await getUserFromSession();
-      setUser(user);
+      const session = await getUserFromSession();
+      setUser(session.user);
     };
 
     fetchUser();

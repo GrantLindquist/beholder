@@ -8,10 +8,9 @@ import {
   getDoc,
   updateDoc,
 } from '@firebase/firestore';
-import db, { auth } from '@/app/firebase';
+import db from '@/app/firebase';
 import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { Button } from '@/components/ui/button';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
@@ -24,10 +23,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   const { campaign, enterCampaign, isUserDm } = useCampaign();
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
-  const [user] = useAuthState(auth);
-
-  const test = useContext(UserContext);
-  console.log(test);
+  const user = useContext(UserContext).user;
 
   // TODO: Use loading states while fetching promises
   useEffect(() => {

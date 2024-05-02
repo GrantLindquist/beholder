@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import db, { auth } from '@/app/firebase';
+import { useContext, useEffect, useState } from 'react';
+import db from '@/app/firebase';
 import {
   arrayUnion,
   collection,
@@ -9,15 +9,14 @@ import {
   updateDoc,
   where,
 } from '@firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import _ from 'lodash';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { Button } from '@/components/ui/button';
 import GameToken from '@/components/board/GameToken';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
+import { UserContext } from '@/hooks/userContext';
 
 const TokenList = () => {
-  const [user] = useAuthState(auth);
+  const user = useContext(UserContext).user;
   const [tokens, setTokens] = useState<GameBoardToken[]>([]);
   const [selectedToken, setSelectedToken] = useState<GameBoardToken | null>();
   const { focusedBoard } = useFocusedBoard();
@@ -26,7 +25,7 @@ const TokenList = () => {
     const fetchTokens = () => {
       const q = query(
         collection(db, 'tokens'),
-        where('ownerId', '==', _.get(user, 'uid', ''))
+        where('ownerId', '==', user?.uid)
       );
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {

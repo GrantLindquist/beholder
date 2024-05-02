@@ -38,6 +38,14 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     };
   }, [props.boardId]);
 
+  // Update board css class
+  useEffect(() => {
+    const gameBoard = document.querySelector('#game-board');
+    if (gameBoard && board) {
+      gameBoard.style.gridTemplateColumns = `repeat(${board.width}, minmax(0, 1fr))`;
+    }
+  }, [board?.width]);
+
   const handleCellClick = async (
     containedToken: ActiveGameBoardToken | null,
     coords: [number, number]
@@ -62,18 +70,18 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     }
   };
 
-  // TODO: Replace gap w/ functioning borders
-  // TODO: Fix grid to support values other than grid-cols-10
-  const getGridClass = (numCols: number, numRows: number) => {
-    return `grid grid-cols-${numCols} grid-rows-${numRows} gap-1`;
-  };
+  // // TODO: Replace gap w/ functioning borders
+  // // TODO: Fix grid to support values other than grid-cols-10
+  // const getGridClass = (numCols: number) => {
+  //   return `grid grid-cols-${numCols} gap-1`;
+  // };
 
   return (
     <>
       {board && (
         <>
           <h1>{_.get(campaign, 'title')}</h1>
-          <div className={getGridClass(board.width, board.height)}>
+          <div id="game-board">
             {Array.from({ length: board.height }, (__, rowIndex) =>
               Array.from({ length: board.width }, (__, colIndex) => {
                 const token = board.activeTokens.find(
