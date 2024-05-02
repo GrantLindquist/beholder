@@ -53,7 +53,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   ) => {
     if (movingToken) {
       if (
-        movingToken.boardPosition[0] !== coords[0] &&
+        movingToken.boardPosition[0] !== coords[0] ||
         movingToken.boardPosition[1] !== coords[1]
       ) {
         const docRef = doc(db, 'gameBoards', props.boardId);
@@ -69,7 +69,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
           }),
         });
       }
-
       setMovingToken(null);
     } else {
       containedToken && setMovingToken(containedToken);
