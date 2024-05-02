@@ -5,11 +5,17 @@ import { CELL_SIZE } from '@/app/globals';
 import DEFAULT_AVATAR from '@/public/assets/defualt_token.jpg';
 
 // TODO: Image caching?
-const GameToken = (props: { token: GameBoardToken }) => {
+const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
   useEffect(() => {}, [props.token.image]);
 
+  const getSelectedClass = (selected: boolean) => {
+    if (selected) {
+      return `ring-4`;
+    }
+  };
+
   return (
-    <div>
+    <div className={getSelectedClass(props.selected ?? false)}>
       <Image
         src={props.token.image || DEFAULT_AVATAR}
         alt={props.token.title}

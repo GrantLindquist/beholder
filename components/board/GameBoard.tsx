@@ -42,6 +42,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   useEffect(() => {
     const gameBoard = document.querySelector('#game-board');
     if (gameBoard && board) {
+      // @ts-ignore
       gameBoard.style.gridTemplateColumns = `repeat(${board.width}, minmax(0, 1fr))`;
     }
   }, [board?.width]);
@@ -51,30 +52,29 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     coords: [number, number]
   ) => {
     if (movingToken) {
-      const docRef = doc(db, 'gameBoards', props.boardId);
+      if (
+        movingToken.boardPosition[0] !== coords[0] &&
+        movingToken.boardPosition[1] !== coords[1]
+      ) {
+        const docRef = doc(db, 'gameBoards', props.boardId);
 
-      await updateDoc(docRef, {
-        activeTokens: arrayRemove(movingToken),
-      });
+        await updateDoc(docRef, {
+          activeTokens: arrayRemove(movingToken),
+        });
 
-      await updateDoc(docRef, {
-        activeTokens: arrayUnion({
-          ...movingToken,
-          boardPosition: coords,
-        }),
-      });
+        await updateDoc(docRef, {
+          activeTokens: arrayUnion({
+            ...movingToken,
+            boardPosition: coords,
+          }),
+        });
+      }
 
       setMovingToken(null);
     } else {
       containedToken && setMovingToken(containedToken);
     }
   };
-
-  // // TODO: Replace gap w/ functioning borders
-  // // TODO: Fix grid to support values other than grid-cols-10
-  // const getGridClass = (numCols: number) => {
-  //   return `grid grid-cols-${numCols} gap-1`;
-  // };
 
   return (
     <>
@@ -97,7 +97,12 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                       handleCellClick(token || null, [colIndex, rowIndex])
                     }
                   >
-                    {token && <GameToken token={token} />}
+                    {token && (
+                      <GameToken
+                        token={token}
+                        selected={movingToken === token}
+                      />
+                    )}
                   </div>
                 );
               })
