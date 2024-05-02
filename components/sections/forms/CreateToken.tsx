@@ -19,9 +19,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import NextImage from 'next/image';
+import { useToast } from '@/components/ui/use-toast';
 
 const CreateToken = () => {
   const user = useContext(UserContext).user;
+  const { toast } = useToast();
   const [imgPreview, setImgPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof createTokenSchema>>({
@@ -35,20 +37,28 @@ const CreateToken = () => {
   const handleCreateToken = async (
     values: z.infer<typeof createTokenSchema>
   ) => {
-    if (!user) {
-      console.error('An unauthenticated user cannot create tokens.');
-      return;
+    try {
+      if (!user) {
+        console.error('An unauthenticated user cannot create tokens.');
+        return;
+      }
+
+      const newToken: GameBoardToken = {
+        id: generateUUID(),
+        title: values.title,
+        tokenImgURL: values.tokenImg,
+        ownerId: user.uid,
+      };
+
+      const docRef = doc(db, 'tokens', newToken.id);
+      await setDoc(docRef, newToken);
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: 'Critical Fail',
+        description: 'An error occurred while creating your token.',
+      });
     }
-
-    const newToken: GameBoardToken = {
-      id: generateUUID(),
-      title: values.title,
-      tokenImgURL: values.tokenImg,
-      ownerId: user.uid,
-    };
-
-    const docRef = doc(db, 'tokens', newToken.id);
-    await setDoc(docRef, newToken);
   };
 
   // TODO: Accept prop can be bypassed, ensure that users can only upload png/jpeg as avatar

@@ -17,10 +17,11 @@ import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
 import { getUserFromSession } from '@/utils/userSession';
 import { UserContext } from '@/hooks/userContext';
+import { useToast } from '@/components/ui/use-toast';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const [boardScale, setBoardScale] = useState(1);
-
+  const { toast } = useToast();
   const { campaign, enterCampaign, isUserDm } = useCampaign();
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
   const user = useContext(UserContext).user;
@@ -31,17 +32,27 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   }, [params.id]);
 
   useEffect(() => {
-    const fetchDefaultBoardId = async () => {
-      console.log(await getUserFromSession());
-      if (campaign) {
-        const campaignDocRef = doc(db, 'campaigns', campaign.id);
-        const campaignDocSnap = await getDoc(campaignDocRef);
-        if (campaignDocSnap.exists()) {
-          setFocusedBoardId(_.get(campaignDocSnap.data(), 'boardIds.0', null));
+    try {
+      const fetchDefaultBoardId = async () => {
+        console.log(await getUserFromSession());
+        if (campaign) {
+          const campaignDocRef = doc(db, 'campaigns', campaign.id);
+          const campaignDocSnap = await getDoc(campaignDocRef);
+          if (campaignDocSnap.exists()) {
+            setFocusedBoardId(
+              _.get(campaignDocSnap.data(), 'boardIds.0', null)
+            );
+          }
         }
-      }
-    };
-    fetchDefaultBoardId();
+      };
+      fetchDefaultBoardId();
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: 'Critical Fail',
+        description: 'An error occurred while loading your campaign.',
+      });
+    }
   }, [campaign]);
 
   const handleMagnify = (_event: Event, newValue: number | number[]) => {

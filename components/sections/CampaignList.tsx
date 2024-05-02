@@ -7,30 +7,40 @@ import Link from 'next/link';
 import { CampaignPreview } from '@/types/GameBoardTypes';
 import { doc, getDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
+import { useToast } from '@/components/ui/use-toast';
 
 const CampaignList = (props: { campaignIds: string[] }) => {
+  const { toast } = useToast();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [campaignPreviews, setCampaignPreviews] = useState<
     CampaignPreview[] | null
   >(null);
 
   useEffect(() => {
-    const fetchCampaignPreviews = async (campaignIds: string[]) => {
-      let campaignPreviews = [];
-      for (const id of campaignIds) {
-        const docRef = doc(db, 'campaigns', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          campaignPreviews.push({
-            id: id,
-            title: docSnap.data().title,
-            description: docSnap.data().description,
-          });
+    try {
+      const fetchCampaignPreviews = async (campaignIds: string[]) => {
+        let campaignPreviews = [];
+        for (const id of campaignIds) {
+          const docRef = doc(db, 'campaigns', id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            campaignPreviews.push({
+              id: id,
+              title: docSnap.data().title,
+              description: docSnap.data().description,
+            });
+          }
         }
-      }
-      setCampaignPreviews(campaignPreviews);
-    };
-    fetchCampaignPreviews(props.campaignIds);
+        setCampaignPreviews(campaignPreviews);
+      };
+      fetchCampaignPreviews(props.campaignIds);
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: 'Critical Fail',
+        description: 'An error occurred while loading your campaigns.',
+      });
+    }
   }, [props.campaignIds]);
 
   return (

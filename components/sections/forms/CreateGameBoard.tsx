@@ -20,10 +20,13 @@ import { GameBoardType } from '@/types/GameBoardTypes';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import NextImage from 'next/image';
+import { useToast } from '@/components/ui/use-toast';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
+  const { toast } = useToast();
   const [bgPreview, setBgPreview] = useState<string | null>(null);
+  const [forceRatio, setForceRatio] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof createGameBoardSchema>>({
     resolver: zodResolver(createGameBoardSchema),
@@ -38,22 +41,30 @@ const CreateGameBoard = () => {
   const handleCreateBoard = async (
     values: z.infer<typeof createGameBoardSchema>
   ) => {
-    const newBoard: GameBoardType = {
-      id: generateUUID(),
-      title: values.title,
-      width: values.width,
-      height: values.height,
-      backgroundImgURL: values.backgroundImg,
-      activeTokens: [],
-    };
+    try {
+      const newBoard: GameBoardType = {
+        id: generateUUID(),
+        title: values.title,
+        width: values.width,
+        height: values.height,
+        backgroundImgURL: values.backgroundImg,
+        activeTokens: [],
+      };
 
-    if (campaign) {
-      const boardDoc = doc(db, 'gameBoards', newBoard.id);
-      await setDoc(boardDoc, newBoard);
+      if (campaign) {
+        const boardDoc = doc(db, 'gameBoards', newBoard.id);
+        await setDoc(boardDoc, newBoard);
 
-      const campaignRef = doc(db, 'campaigns', campaign.id);
-      await updateDoc(campaignRef, {
-        boardIds: arrayUnion(newBoard.id),
+        const campaignRef = doc(db, 'campaigns', campaign.id);
+        await updateDoc(campaignRef, {
+          boardIds: arrayUnion(newBoard.id),
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: 'Critical Fail',
+        description: 'An error occurred while creating your board.',
       });
     }
   };
@@ -63,6 +74,7 @@ const CreateGameBoard = () => {
     img.src = URL.createObjectURL(e.target.files[0]);
     img.onload = () => {
       console.log(`Image dimensions: ${img.naturalWidth}x${img.naturalHeight}`);
+      setForceRatio(true);
     };
     setBgPreview(img.src);
   }
@@ -93,7 +105,13 @@ const CreateGameBoard = () => {
             <FormItem>
               <FormLabel>Background Image</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <input
+                  type="file"
+                  placeholder="shadcn"
+                  accept=".jpg, .jpeg, .png"
+                  {...field}
+                  onChange={handleUploadFile}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -107,32 +125,41 @@ const CreateGameBoard = () => {
             alt="Background Image Preview"
           />
         )}
-        <FormField
-          control={form.control}
-          name="width"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Width</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="height"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Height</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-row items-end gap-4">
+          <FormField
+            control={form.control}
+            name="width"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Width</FormLabel>
+                <FormControl>
+                  <Input placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="height"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Height</FormLabel>
+                <FormControl>
+                  <Input placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            size="icon"
+            variant={forceRatio ? 'outline' : 'ghost'}
+            onClick={() => setForceRatio(!forceRatio)}
+          >
+            Link
+          </Button>
+        </div>
         <Button type="submit">Submit</Button>
       </form>
     </Form>

@@ -70,9 +70,13 @@ export default function Home() {
       {user ? (
         <>
           <CampaignList campaignIds={campaignIds} />
-          <Button variant="outline" onClick={handleSignOut}>
-            Sign-out
-          </Button>
+          <div className="flex flex-row gap-4">
+            <Button variant="outline">Join Campaign</Button>
+            <Button variant="outline">Create Campaign</Button>
+            <Button variant="outline" onClick={handleSignOut}>
+              Sign-out
+            </Button>
+          </div>
         </>
       ) : (
         <Button variant="outline" onClick={handleSignIn}>
