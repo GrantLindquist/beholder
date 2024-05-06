@@ -28,8 +28,8 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   // TODO: Use loading states while fetching promises
   useEffect(() => {
-    enterCampaign(params.id, _.get(user, 'uid', ''));
-  }, [params.id]);
+    user?.uid && enterCampaign(params.id, user.uid);
+  }, [params.id, user]);
 
   useEffect(() => {
     try {
