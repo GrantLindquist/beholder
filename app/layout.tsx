@@ -5,7 +5,7 @@ import { CampaignProvider } from '@/hooks/useCampaign';
 import { ReactNode } from 'react';
 import './globals.css';
 import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
-import { UserProvider } from '@/hooks/userContext';
+import { UserProvider } from '@/hooks/useUser';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });

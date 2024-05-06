@@ -11,13 +11,14 @@ import { Button } from '@/components/ui/button';
 import CampaignList from '@/components/sections/CampaignList';
 import { doc, getDoc, setDoc } from '@firebase/firestore';
 import _ from 'lodash';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { setUserSession } from '@/utils/userSession';
 import { UserFunctional, UserSession } from '@/types/UserTypes';
-import { UserContext } from '@/hooks/userContext';
+import { useUser } from '@/hooks/useUser';
 
 export default function Home() {
-  const user = useContext(UserContext).user;
+  const { user } = useUser();
+
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
 
   const handleSignIn = () => {
@@ -60,7 +61,6 @@ export default function Home() {
       setCampaignIds(_.get(docSnap.data(), 'campaigns', []));
     };
     if (user) {
-      console.log(user);
       fetchCampaignIds(user.uid);
     }
   }, [user]);

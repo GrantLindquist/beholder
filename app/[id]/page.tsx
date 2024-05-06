@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   arrayRemove,
   deleteDoc,
@@ -15,16 +15,16 @@ import { Button } from '@/components/ui/button';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
-import { getUserFromSession } from '@/utils/userSession';
-import { UserContext } from '@/hooks/userContext';
+import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/components/ui/use-toast';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
-  const [boardScale, setBoardScale] = useState(1);
   const { toast } = useToast();
-  const { campaign, enterCampaign, isUserDm } = useCampaign();
+  const { user } = useUser();
+  const { campaign, enterCampaign } = useCampaign();
+
+  const [boardScale, setBoardScale] = useState(1);
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
-  const user = useContext(UserContext).user;
 
   // TODO: Use loading states while fetching promises
   useEffect(() => {
@@ -34,7 +34,6 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     try {
       const fetchDefaultBoardId = async () => {
-        console.log(await getUserFromSession());
         if (campaign) {
           const campaignDocRef = doc(db, 'campaigns', campaign.id);
           const campaignDocSnap = await getDoc(campaignDocRef);

@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { doc, setDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import { generateUUID } from '@/utils/uuid';
-import { UserContext } from '@/hooks/userContext';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,10 +19,12 @@ import {
 import { Input } from '@/components/ui/input';
 import NextImage from 'next/image';
 import { useToast } from '@/components/ui/use-toast';
+import { useUser } from '@/hooks/useUser';
 
 const CreateToken = () => {
-  const user = useContext(UserContext).user;
+  const { user } = useUser();
   const { toast } = useToast();
+
   const [imgPreview, setImgPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof createTokenSchema>>({
@@ -52,6 +53,11 @@ const CreateToken = () => {
 
       const docRef = doc(db, 'tokens', newToken.id);
       await setDoc(docRef, newToken);
+
+      if (imgPreview) {
+        //uploadToS3
+        console.log(imgPreview);
+      }
     } catch (e) {
       console.error(e);
       toast({

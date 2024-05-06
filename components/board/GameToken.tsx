@@ -10,7 +10,7 @@ const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
 
   const getSelectedClass = (selected: boolean) => {
     if (selected) {
-      return `ring-4`;
+      return 'ring-4';
     }
   };
 

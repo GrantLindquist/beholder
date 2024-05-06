@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import {
   arrayUnion,
@@ -13,15 +13,16 @@ import { GameBoardToken } from '@/types/GameBoardTypes';
 import { Button } from '@/components/ui/button';
 import GameToken from '@/components/board/GameToken';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
-import { UserContext } from '@/hooks/userContext';
+import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/components/ui/use-toast';
 
 const TokenList = () => {
-  const user = useContext(UserContext).user;
+  const { user } = useUser();
   const { toast } = useToast();
+  const { focusedBoard } = useFocusedBoard();
+
   const [tokens, setTokens] = useState<GameBoardToken[]>([]);
   const [selectedToken, setSelectedToken] = useState<GameBoardToken | null>();
-  const { focusedBoard } = useFocusedBoard();
 
   useEffect(() => {
     try {

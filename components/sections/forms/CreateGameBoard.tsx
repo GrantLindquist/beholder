@@ -26,7 +26,8 @@ const CreateGameBoard = () => {
   const { campaign } = useCampaign();
   const { toast } = useToast();
   const [bgPreview, setBgPreview] = useState<string | null>(null);
-  const [forceRatio, setForceRatio] = useState<boolean>(false);
+  // Width divided by height
+  const [bgRatio, setBgRatio] = useState<number | null>(null);
 
   const form = useForm<z.infer<typeof createGameBoardSchema>>({
     resolver: zodResolver(createGameBoardSchema),
@@ -59,6 +60,11 @@ const CreateGameBoard = () => {
         await updateDoc(campaignRef, {
           boardIds: arrayUnion(newBoard.id),
         });
+
+        if (bgPreview) {
+          //uploadToS3
+          console.log(bgPreview);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -69,21 +75,33 @@ const CreateGameBoard = () => {
     }
   };
 
-  function handleUploadFile(e: any) {
+  const handleUploadFile = (e: any) => {
     const img = new Image();
     img.src = URL.createObjectURL(e.target.files[0]);
     img.onload = () => {
-      console.log(`Image dimensions: ${img.naturalWidth}x${img.naturalHeight}`);
-      setForceRatio(true);
+      const ratio = img.naturalWidth / img.naturalHeight;
+      setBgRatio(ratio);
+      form.setValue('width', DEFAULT_BOARD_SIZE);
+      form.setValue('height', DEFAULT_BOARD_SIZE / ratio);
     };
     setBgPreview(img.src);
-  }
+  };
+
+  const handleRatio = (field: 'width' | 'height') => {
+    if (bgRatio) {
+      if (field === 'width') {
+        form.setValue('height', Math.round(form.getValues().width / bgRatio));
+      } else if (field == 'height') {
+        form.setValue('width', Math.round(form.getValues().height * bgRatio));
+      }
+    }
+  };
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleCreateBoard)}
-        className="space-y-1"
+        className="space-y-1 p-4"
       >
         <FormField
           control={form.control}
@@ -133,7 +151,15 @@ const CreateGameBoard = () => {
               <FormItem>
                 <FormLabel>Width</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="shadcn"
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleRatio(field.name);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -146,7 +172,15 @@ const CreateGameBoard = () => {
               <FormItem>
                 <FormLabel>Height</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="shadcn"
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleRatio(field.name);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -154,8 +188,8 @@ const CreateGameBoard = () => {
           />
           <Button
             size="icon"
-            variant={forceRatio ? 'outline' : 'ghost'}
-            onClick={() => setForceRatio(!forceRatio)}
+            variant={bgRatio ? 'outline' : 'ghost'}
+            // onClick={() => setForceRatio(!forceRatio)}
           >
             Link
           </Button>

@@ -4,5 +4,7 @@
 
 #game-board {
  display: grid;
- gap: .25rem;
+}
+#game-board > * {
+ border: 1px solid black;
 }
