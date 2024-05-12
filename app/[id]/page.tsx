@@ -68,9 +68,6 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
       await updateDoc(campaignDocRef, {
         boardIds: arrayRemove(boardId),
       });
-
-      const defaultId = await fetchDefaultBoardId();
-      setFocusedBoardId(defaultId);
     }
   };
 

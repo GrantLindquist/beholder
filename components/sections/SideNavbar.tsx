@@ -105,7 +105,9 @@ const SideNavbarIcon = ({
         </TooltipProvider>
       </DropdownMenuTrigger>
       {children && (
-        <DropdownMenuContent side="right">{children}</DropdownMenuContent>
+        <DropdownMenuContent className="max-w-96" side="right">
+          {children}
+        </DropdownMenuContent>
       )}
     </DropdownMenu>
   );

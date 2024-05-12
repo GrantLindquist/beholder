@@ -21,6 +21,8 @@ import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import NextImage from 'next/image';
 import { useToast } from '@/components/ui/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
@@ -82,18 +84,26 @@ const CreateGameBoard = () => {
       const ratio = img.naturalWidth / img.naturalHeight;
       setBgRatio(ratio);
       form.setValue('width', DEFAULT_BOARD_SIZE);
-      form.setValue('height', DEFAULT_BOARD_SIZE / ratio);
+      form.setValue('height', Math.round(DEFAULT_BOARD_SIZE / ratio));
+      setBgPreview(img.src);
     };
-    setBgPreview(img.src);
   };
 
-  const handleRatio = (field: 'width' | 'height') => {
+  const handleChangeBgRatio = (field: 'width' | 'height') => {
     if (bgRatio) {
       if (field === 'width') {
         form.setValue('height', Math.round(form.getValues().width / bgRatio));
       } else if (field == 'height') {
         form.setValue('width', Math.round(form.getValues().height * bgRatio));
       }
+    }
+  };
+
+  const handleToggleBgRatio = () => {
+    if (bgRatio) {
+      setBgRatio(null);
+    } else {
+      setBgRatio(form.getValues('width') / form.getValues('height'));
     }
   };
 
@@ -159,7 +169,7 @@ const CreateGameBoard = () => {
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);
-                      handleRatio(field.name);
+                      handleChangeBgRatio(field.name);
                     }}
                   />
                 </FormControl>
@@ -180,7 +190,7 @@ const CreateGameBoard = () => {
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);
-                      handleRatio(field.name);
+                      handleChangeBgRatio(field.name);
                     }}
                   />
                 </FormControl>
@@ -191,11 +201,22 @@ const CreateGameBoard = () => {
           <Button
             size="icon"
             variant={bgRatio ? 'outline' : 'ghost'}
-            // onClick={() => setForceRatio(!forceRatio)}
+            type="button"
+            onClick={handleToggleBgRatio}
           >
             Link
           </Button>
         </div>
+        {!bgRatio && bgPreview && (
+          <Alert variant="destructive">
+            <ExclamationTriangleIcon className="h-4 w-4" />
+            <AlertDescription>
+              The board width-height ratio is preset based on your selected
+              image's dimensions. Changing it may manipulate your background
+              image in unexpected ways.
+            </AlertDescription>
+          </Alert>
+        )}
         <Button type="submit">Submit</Button>
       </form>
     </Form>
