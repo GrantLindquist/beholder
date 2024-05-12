@@ -32,7 +32,7 @@ const CreateGameBoard = () => {
   const form = useForm<z.infer<typeof createGameBoardSchema>>({
     resolver: zodResolver(createGameBoardSchema),
     defaultValues: {
-      title: '',
+      title: undefined,
       backgroundImg: undefined,
       width: DEFAULT_BOARD_SIZE,
       height: DEFAULT_BOARD_SIZE,
@@ -48,8 +48,8 @@ const CreateGameBoard = () => {
         title: values.title,
         width: values.width,
         height: values.height,
-        backgroundImgURL: values.backgroundImg,
         activeTokens: [],
+        ...(values.backgroundImg && { backgroundImgURL: values.backgroundImg }),
       };
 
       if (campaign) {
@@ -97,6 +97,7 @@ const CreateGameBoard = () => {
     }
   };
 
+  // TODO: Remove ts-ignore and fix ts issue
   return (
     <Form {...form}>
       <form
@@ -123,6 +124,7 @@ const CreateGameBoard = () => {
             <FormItem>
               <FormLabel>Background Image</FormLabel>
               <FormControl>
+                {/* @ts-ignore */}
                 <input
                   type="file"
                   placeholder="shadcn"

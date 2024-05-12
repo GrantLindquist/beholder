@@ -33,17 +33,6 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     try {
-      const fetchDefaultBoardId = async () => {
-        if (campaign) {
-          const campaignDocRef = doc(db, 'campaigns', campaign.id);
-          const campaignDocSnap = await getDoc(campaignDocRef);
-          if (campaignDocSnap.exists()) {
-            setFocusedBoardId(
-              _.get(campaignDocSnap.data(), 'boardIds.0', null)
-            );
-          }
-        }
-      };
       fetchDefaultBoardId();
     } catch (e) {
       console.error(e);
@@ -53,6 +42,16 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
       });
     }
   }, [campaign]);
+
+  const fetchDefaultBoardId = async () => {
+    if (campaign) {
+      const campaignDocRef = doc(db, 'campaigns', campaign.id);
+      const campaignDocSnap = await getDoc(campaignDocRef);
+      if (campaignDocSnap.exists()) {
+        setFocusedBoardId(_.get(campaignDocSnap.data(), 'boardIds.0', null));
+      }
+    }
+  };
 
   const handleMagnify = (_event: Event, newValue: number | number[]) => {
     setBoardScale(newValue as number);
@@ -69,6 +68,9 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
       await updateDoc(campaignDocRef, {
         boardIds: arrayRemove(boardId),
       });
+
+      const defaultId = await fetchDefaultBoardId();
+      setFocusedBoardId(defaultId);
     }
   };
 

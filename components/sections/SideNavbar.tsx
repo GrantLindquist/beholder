@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import Link from 'next/link';
-import _ from 'lodash';
 import {
   Collapsible,
   CollapsibleContent,
@@ -27,14 +26,11 @@ import {
 import CreateGameBoard from '@/components/sections/forms/CreateGameBoard';
 import CreateToken from '@/components/sections/forms/CreateToken';
 import TokenList from '@/components/sections/TokenList';
-import { useFocusedBoard } from '@/hooks/useFocusedBoard';
-import { useUser } from '@/hooks/useUser';
+import GameBoardList from '@/components/sections/GameBoardList';
 
 // TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
-  const { isUserDm, campaign } = useCampaign();
-  const { user } = useUser();
-  const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
+  const { isUserDm } = useCampaign();
 
   return (
     <div className="fixed top-0 left-0 h-screen w-20 flex flex-col bg-stone-900 shadow-lg p-2">
@@ -49,20 +45,7 @@ const SideNavbar = () => {
         <>
           <SideNavbarIcon title={'Game Boards'} icon={<Table />}>
             <DropdownMenuLabel>Game Boards</DropdownMenuLabel>
-            {_.map(campaign?.boardIds, (id) => {
-              if (id !== focusedBoard?.id) {
-                return (
-                  <div key={id}>
-                    <Button
-                      variant={'outline'}
-                      onClick={() => setFocusedBoardId(id)}
-                    >
-                      {id}
-                    </Button>
-                  </div>
-                );
-              }
-            })}
+            <GameBoardList />
             <Collapsible>
               <CollapsibleTrigger>
                 <DropdownMenuLabel>Create New Board</DropdownMenuLabel>

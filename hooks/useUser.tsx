@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { getUserFromSession } from '@/utils/userSession';
 import { UserSession } from '@/types/UserTypes';
+import { useToast } from '@/components/ui/use-toast';
 
 const UseUser = createContext<{
   user: UserSession | null;
@@ -16,18 +17,27 @@ const UseUser = createContext<{
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { toast } = useToast();
   const [user, setUser] = useState<UserSession | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const session = await getUserFromSession();
-      const sessionUser = session.user;
-      setUser({
-        displayName: sessionUser.displayName,
-        email: sessionUser.email,
-        photoURL: sessionUser.photoURL,
-        uid: sessionUser.uid,
-      });
+      try {
+        const session = await getUserFromSession();
+        const sessionUser = session.user;
+        setUser({
+          displayName: sessionUser.displayName,
+          email: sessionUser.email,
+          photoURL: sessionUser.photoURL,
+          uid: sessionUser.uid,
+        });
+      } catch (e) {
+        console.error(e);
+        toast({
+          title: 'Critical Fail',
+          description: 'An error occurred while fetching the user.',
+        });
+      }
     };
 
     fetchUser();

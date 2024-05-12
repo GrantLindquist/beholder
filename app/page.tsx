@@ -15,9 +15,11 @@ import { useEffect, useState } from 'react';
 import { setUserSession } from '@/utils/userSession';
 import { UserFunctional, UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function Home() {
   const { user } = useUser();
+  const { toast } = useToast();
 
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
 
@@ -45,8 +47,12 @@ export default function Home() {
           } as UserFunctional);
         }
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((e) => {
+        console.error(e);
+        toast({
+          title: 'Critical Fail',
+          description: 'An error occurred while signing in.',
+        });
       });
   };
 
