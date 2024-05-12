@@ -1,8 +1,10 @@
 // TODO: Look into replacing interfaces w/ classes and including to/from firestore conversion methods
 // TODO: Investigate whether having ids in types causes db mismatch
-export interface GameBoardType {
+export interface GameBoardBase {
   id: string;
   title: string;
+}
+export interface GameBoardType extends GameBoardBase {
   width: number;
   height: number;
   backgroundImgURL?: string;
