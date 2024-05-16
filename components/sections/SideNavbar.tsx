@@ -79,6 +79,7 @@ const SideNavbar = () => {
 };
 export default SideNavbar;
 
+// TODO: Revise this to be a normal button if children is not defined
 const SideNavbarIcon = ({
   children,
   icon,
@@ -94,7 +95,7 @@ const SideNavbarIcon = ({
         <TooltipProvider delayDuration={500}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button className="bg-stone-800 m-1.5 h-12 hover:bg-purple-800">
+              <Button className="bg-stone-800 m-1.5 h-12 hover:bg-purple-800 text-white">
                 {icon}
               </Button>
             </TooltipTrigger>

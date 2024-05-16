@@ -44,6 +44,8 @@ const CreateGameBoard = () => {
   const handleCreateBoard = async (
     values: z.infer<typeof createGameBoardSchema>
   ) => {
+    // props.closeDropdownMenu();
+
     try {
       const newBoard: GameBoardType = {
         id: generateUUID(),
@@ -212,8 +214,8 @@ const CreateGameBoard = () => {
             <ExclamationTriangleIcon className="h-4 w-4" />
             <AlertDescription>
               The board width-height ratio is preset based on your selected
-              image's dimensions. Changing it may manipulate your background
-              image in unexpected ways.
+              image&apos;s dimensions. Changing it may manipulate your
+              background image in unexpected ways.
             </AlertDescription>
           </Alert>
         )}
