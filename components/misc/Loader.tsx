@@ -1,7 +1,5 @@
-// 'use client';
-//
-// export function Loader() {
-//   const { isLoading } = useLoader();
-//
-//   return <ToastProvider></ToastProvider>;
-// }
+'use client';
+
+export function Loader() {
+  return <h1>Loading...</h1>;
+}

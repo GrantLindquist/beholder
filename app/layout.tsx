@@ -6,7 +6,7 @@ import { ReactNode } from 'react';
 import './globals.css';
 import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
 import { UserProvider } from '@/hooks/useUser';
-import { Toaster } from '@/components/ui/toaster';
+import { LoadingProvider } from '@/hooks/useLoader';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,12 +24,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           attribute="class"
           defaultTheme="dark"
         >
-          <UserProvider>
-            <CampaignProvider>
-              <FocusedBoardProvider>{children}</FocusedBoardProvider>
-            </CampaignProvider>
-          </UserProvider>
-          <Toaster />
+          <LoadingProvider>
+            <UserProvider>
+              <CampaignProvider>
+                <FocusedBoardProvider>{children}</FocusedBoardProvider>
+              </CampaignProvider>
+            </UserProvider>
+          </LoadingProvider>
         </ThemeProvider>
       </body>
     </html>

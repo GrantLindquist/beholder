@@ -16,15 +16,15 @@ import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
 import { useUser } from '@/hooks/useUser';
-import { useToast } from '@/components/ui/use-toast';
+import { useLoader } from '@/hooks/useLoader';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
-  const { toast } = useToast();
+  const { load } = useLoader();
   const { user } = useUser();
   const { campaign, enterCampaign } = useCampaign();
+  const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
 
   const [boardScale, setBoardScale] = useState(1);
-  const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
 
   // TODO: Use loading states while fetching promises
   useEffect(() => {
@@ -32,26 +32,20 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   }, [params.id, user]);
 
   useEffect(() => {
-    try {
-      fetchDefaultBoardId();
-    } catch (e) {
-      console.error(e);
-      toast({
-        title: 'Critical Fail',
-        description: 'An error occurred while loading your campaign.',
-      });
-    }
-  }, [campaign]);
-
-  const fetchDefaultBoardId = async () => {
-    if (campaign) {
-      const campaignDocRef = doc(db, 'campaigns', campaign.id);
-      const campaignDocSnap = await getDoc(campaignDocRef);
-      if (campaignDocSnap.exists()) {
-        setFocusedBoardId(_.get(campaignDocSnap.data(), 'boardIds.0', null));
+    const fetchDefaultBoardId = async () => {
+      if (campaign) {
+        const campaignDocRef = doc(db, 'campaigns', campaign.id);
+        const campaignDocSnap = await getDoc(campaignDocRef);
+        if (campaignDocSnap.exists()) {
+          setFocusedBoardId(_.get(campaignDocSnap.data(), 'boardIds.0', null));
+        }
       }
-    }
-  };
+    };
+    load(
+      fetchDefaultBoardId(),
+      'An error occurred while loading your current game board.'
+    );
+  }, [campaign]);
 
   const handleMagnify = (_event: Event, newValue: number | number[]) => {
     setBoardScale(newValue as number);

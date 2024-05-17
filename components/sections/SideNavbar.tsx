@@ -41,22 +41,19 @@ const SideNavbar = () => {
         <DoorOpen />
       </Link>
       <Separator className="my-2 bg-stone-600" />
-      {isUserDm && (
-        <>
-          <SideNavbarIcon title={'Game Boards'} icon={<Table />}>
-            <DropdownMenuLabel>Game Boards</DropdownMenuLabel>
-            <GameBoardList />
-            <Collapsible>
-              <CollapsibleTrigger>
-                <DropdownMenuLabel>Create New Board</DropdownMenuLabel>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CreateGameBoard />
-              </CollapsibleContent>
-            </Collapsible>
-          </SideNavbarIcon>
-        </>
-      )}
+
+      <SideNavbarIcon title={'Game Boards'} icon={<Table />}>
+        <DropdownMenuLabel>Game Boards</DropdownMenuLabel>
+        <GameBoardList />
+        <Collapsible>
+          <CollapsibleTrigger>
+            <DropdownMenuLabel>Create New Board</DropdownMenuLabel>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CreateGameBoard />
+          </CollapsibleContent>
+        </Collapsible>
+      </SideNavbarIcon>
 
       <SideNavbarIcon title={'Game Tokens'} icon={<SmilePlus />}>
         <DropdownMenuLabel>Your Tokens</DropdownMenuLabel>

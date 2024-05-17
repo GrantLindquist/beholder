@@ -15,15 +15,15 @@ import { useEffect, useState } from 'react';
 import { setUserSession } from '@/utils/userSession';
 import { UserFunctional, UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
-import { useToast } from '@/components/ui/use-toast';
+import { useLoader } from '@/hooks/useLoader';
 
 export default function Home() {
   const { user } = useUser();
-  const { toast } = useToast();
+  const { load } = useLoader();
 
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
       // Add user to firestore if it does not exist
@@ -46,13 +46,6 @@ export default function Home() {
             campaigns: [],
           } as UserFunctional);
         }
-      })
-      .catch((e) => {
-        console.error(e);
-        toast({
-          title: 'Critical Fail',
-          description: 'An error occurred while signing in.',
-        });
       });
   };
 
@@ -67,7 +60,10 @@ export default function Home() {
       setCampaignIds(_.get(docSnap.data(), 'campaigns', []));
     };
     if (user) {
-      fetchCampaignIds(user.uid);
+      load(
+        fetchCampaignIds(user.uid),
+        'An error occurred while loading your campaigns.'
+      );
     }
   }, [user]);
 
@@ -85,7 +81,12 @@ export default function Home() {
           </div>
         </>
       ) : (
-        <Button variant="outline" onClick={handleSignIn}>
+        <Button
+          variant="outline"
+          onClick={() =>
+            load(handleSignIn(), 'An error occurred while signing into Google.')
+          }
+        >
           Sign-in with Google
         </Button>
       )}

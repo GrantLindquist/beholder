@@ -14,44 +14,36 @@ import { Button } from '@/components/ui/button';
 import GameToken from '@/components/board/GameToken';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import { useUser } from '@/hooks/useUser';
-import { useToast } from '@/components/ui/use-toast';
+import { useLoader } from '@/hooks/useLoader';
 
 const TokenList = () => {
   const { user } = useUser();
-  const { toast } = useToast();
+  const { load } = useLoader();
   const { focusedBoard } = useFocusedBoard();
 
   const [tokens, setTokens] = useState<GameBoardToken[]>([]);
   const [selectedToken, setSelectedToken] = useState<GameBoardToken | null>();
 
   useEffect(() => {
-    try {
-      const fetchTokens = () => {
-        const q = query(
-          collection(db, 'tokens'),
-          where('ownerId', '==', user?.uid)
-        );
+    const fetchTokens = async () => {
+      const q = query(
+        collection(db, 'tokens'),
+        where('ownerId', '==', user?.uid)
+      );
 
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-          const tokens = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            title: doc.data().title,
-            ownerId: doc.data().ownerId,
-          }));
-          setTokens(tokens);
-        });
-
-        return () => unsubscribe();
-      };
-
-      fetchTokens();
-    } catch (e) {
-      console.error(e);
-      toast({
-        title: 'Critical Fail',
-        description: 'An error occurred while fetching your tokens.',
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const tokens = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          title: doc.data().title,
+          ownerId: doc.data().ownerId,
+        }));
+        setTokens(tokens);
       });
-    }
+
+      return () => unsubscribe();
+    };
+
+    load(fetchTokens(), 'An error occurred while loading your tokens.');
   }, [user]);
 
   const handleInitToken = async () => {

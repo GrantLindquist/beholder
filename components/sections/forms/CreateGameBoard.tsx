@@ -20,13 +20,13 @@ import { GameBoardType } from '@/types/GameBoardTypes';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import NextImage from 'next/image';
-import { useToast } from '@/components/ui/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { useLoader } from '@/hooks/useLoader';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
-  const { toast } = useToast();
+  const { load } = useLoader();
   const [bgPreview, setBgPreview] = useState<string | null>(null);
   // Width divided by height
   const [bgRatio, setBgRatio] = useState<number | null>(null);
@@ -46,36 +46,28 @@ const CreateGameBoard = () => {
   ) => {
     // props.closeDropdownMenu();
 
-    try {
-      const newBoard: GameBoardType = {
-        id: generateUUID(),
-        title: values.title,
-        width: values.width,
-        height: values.height,
-        activeTokens: [],
-        ...(values.backgroundImg && { backgroundImgURL: values.backgroundImg }),
-      };
+    const newBoard: GameBoardType = {
+      id: generateUUID(),
+      title: values.title,
+      width: values.width,
+      height: values.height,
+      activeTokens: [],
+      ...(values.backgroundImg && { backgroundImgURL: values.backgroundImg }),
+    };
 
-      if (campaign) {
-        const boardDoc = doc(db, 'gameBoards', newBoard.id);
-        await setDoc(boardDoc, newBoard);
+    if (campaign) {
+      const boardDoc = doc(db, 'gameBoards', newBoard.id);
+      await setDoc(boardDoc, newBoard);
 
-        const campaignRef = doc(db, 'campaigns', campaign.id);
-        await updateDoc(campaignRef, {
-          boardIds: arrayUnion(newBoard.id),
-        });
-
-        if (bgPreview) {
-          //uploadToS3
-          console.log(bgPreview);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-      toast({
-        title: 'Critical Fail',
-        description: 'An error occurred while creating your board.',
+      const campaignRef = doc(db, 'campaigns', campaign.id);
+      await updateDoc(campaignRef, {
+        boardIds: arrayUnion(newBoard.id),
       });
+
+      if (bgPreview) {
+        //uploadToS3
+        console.log(bgPreview);
+      }
     }
   };
 
