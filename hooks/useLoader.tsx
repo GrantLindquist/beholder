@@ -16,6 +16,7 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
 
   const [isLoading, setLoading] = useState(false);
 
+  // TODO: Revise loader to replace param error msg w/ error message from api
   const load = async (
     promise: Promise<any>,
     error: string,

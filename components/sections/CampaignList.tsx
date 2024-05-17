@@ -42,7 +42,7 @@ const CampaignList = (props: { campaignIds: string[] }) => {
     <div className="max-w-5xl mx-auto px-8">
       <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10">
         {_.map(campaignPreviews, (preview, index) => (
-          <Link href={`/${preview.id}`} key={index}>
+          <Link href={`/campaigns/${preview.id}`} key={index}>
             <div
               className="relative group  block p-2 h-full w-full "
               onMouseEnter={() => setHoveredIndex(index)}

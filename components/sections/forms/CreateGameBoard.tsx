@@ -17,16 +17,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { generateUUID } from '@/utils/uuid';
 import { GameBoardType } from '@/types/GameBoardTypes';
-import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
-import db from '@/app/firebase';
 import NextImage from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { useLoader } from '@/hooks/useLoader';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
-  const { load } = useLoader();
   const [bgPreview, setBgPreview] = useState<string | null>(null);
   // Width divided by height
   const [bgRatio, setBgRatio] = useState<number | null>(null);
@@ -56,17 +52,16 @@ const CreateGameBoard = () => {
     };
 
     if (campaign) {
-      const boardDoc = doc(db, 'gameBoards', newBoard.id);
-      await setDoc(boardDoc, newBoard);
-
-      const campaignRef = doc(db, 'campaigns', campaign.id);
-      await updateDoc(campaignRef, {
-        boardIds: arrayUnion(newBoard.id),
-      });
+      // const boardDoc = doc(db, 'gameBoards', newBoard.id);
+      // await setDoc(boardDoc, newBoard);
+      //
+      // const campaignRef = doc(db, 'campaigns', campaign.id);
+      // await updateDoc(campaignRef, {
+      //   boardIds: arrayUnion(newBoard.id),
+      // });
 
       if (bgPreview) {
-        //uploadToS3
-        console.log(bgPreview);
+        // uploadToS3(bgPreview);
       }
     }
   };
