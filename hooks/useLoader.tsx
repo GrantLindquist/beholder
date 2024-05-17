@@ -21,7 +21,7 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
     error: string,
     success?: string
   ) => {
-    setLoading(true);
+    !isLoading && setLoading(true);
     try {
       await promise;
       setLoading(false);

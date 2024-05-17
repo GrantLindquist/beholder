@@ -86,3 +86,16 @@
 #game-board > * {
  border: 1px solid black;
 }
+
+.progress-container {
+  width: 100%;
+  height: 5px;
+  background-color: rgba(255, 255, 255, .1);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #6600ff 25%, #00c9ff 50%, #92cbdf 75%);
+  background-size: 200% auto;
+}
