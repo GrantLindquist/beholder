@@ -13,6 +13,8 @@ import db from '@/app/firebase';
 import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
 import GameToken from '@/components/board/GameToken';
+import { closestCorners, DndContext } from '@dnd-kit/core';
+import { GameBoardCell } from '@/components/board/GameBoardCell';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const [board, setBoard] = useState<GameBoardType>();
@@ -47,38 +49,54 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     }
   }, [board?.width]);
 
+  const moveToken = async (coords: [number, number]) => {
+    const docRef = doc(db, 'gameBoards', props.boardId);
+
+    await updateDoc(docRef, {
+      activeTokens: arrayRemove(movingToken),
+    });
+
+    await updateDoc(docRef, {
+      activeTokens: arrayUnion({
+        ...movingToken,
+        boardPosition: coords,
+      }),
+    });
+
+    setMovingToken(null);
+  };
+
   const handleCellClick = async (
-    containedToken: ActiveGameBoardToken | null,
-    coords: [number, number]
+    coords: [number, number],
+    token: ActiveGameBoardToken | null
   ) => {
     if (movingToken) {
       if (
         movingToken.boardPosition[0] !== coords[0] ||
         movingToken.boardPosition[1] !== coords[1]
       ) {
-        const docRef = doc(db, 'gameBoards', props.boardId);
-
-        await updateDoc(docRef, {
-          activeTokens: arrayRemove(movingToken),
-        });
-
-        await updateDoc(docRef, {
-          activeTokens: arrayUnion({
-            ...movingToken,
-            boardPosition: coords,
-          }),
-        });
+        await moveToken(coords);
       }
-      setMovingToken(null);
     } else {
-      containedToken && setMovingToken(containedToken);
+      setMovingToken(token);
     }
+  };
+
+  const handleDragToken = async (event: any) => {
+    const { over } = event;
+    const coords: [number, number] = over.id
+      .split(',')
+      .map((coord: string) => parseInt(coord, 10));
+    await moveToken(coords);
   };
 
   return (
     <>
       {board && (
-        <>
+        <DndContext
+          onDragEnd={handleDragToken}
+          collisionDetection={closestCorners}
+        >
           <h1>{_.get(campaign, 'title')}</h1>
           <div id="game-board">
             {Array.from({ length: board.height }, (__, rowIndex) =>
@@ -89,25 +107,29 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                     token.boardPosition[1] === rowIndex
                 );
                 return (
-                  <div
-                    key={`${colIndex},${rowIndex}`}
-                    className="size-12 bg-stone-900"
-                    onClick={() =>
-                      handleCellClick(token || null, [colIndex, rowIndex])
-                    }
-                  >
-                    {token && (
-                      <GameToken
-                        token={token}
-                        selected={movingToken === token}
-                      />
-                    )}
+                  <div key={`${colIndex},${rowIndex}`}>
+                    <GameBoardCell
+                      token={token || null}
+                      onClick={() =>
+                        handleCellClick([colIndex, rowIndex], token || null)
+                      }
+                      droppableId={`${colIndex},${rowIndex}`}
+                    >
+                      {token ? (
+                        <GameToken
+                          token={token}
+                          selected={movingToken?.id === token.id}
+                        />
+                      ) : (
+                        <></>
+                      )}
+                    </GameBoardCell>
                   </div>
                 );
               })
             )}
           </div>
-        </>
+        </DndContext>
       )}
     </>
   );

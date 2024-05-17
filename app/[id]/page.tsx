@@ -11,12 +11,13 @@ import {
 import db from '@/app/firebase';
 import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
-import { Button } from '@/components/ui/button';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
 import { useUser } from '@/hooks/useUser';
 import { useLoader } from '@/hooks/useLoader';
+import { SearchIcon } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { load } = useLoader();
@@ -26,9 +27,14 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   const [boardScale, setBoardScale] = useState(1);
 
-  // TODO: Use loading states while fetching promises
   useEffect(() => {
-    user?.uid && enterCampaign(params.id, user.uid);
+    const initializeCampaign = async () => {
+      user?.uid && enterCampaign(params.id, user.uid);
+    };
+    load(
+      initializeCampaign(),
+      'An error occurred while entering your campaign'
+    );
   }, [params.id, user]);
 
   useEffect(() => {
@@ -47,8 +53,8 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
     );
   }, [campaign]);
 
-  const handleMagnify = (_event: Event, newValue: number | number[]) => {
-    setBoardScale(newValue as number);
+  const handleMagnify = (newValue: number[]) => {
+    setBoardScale(newValue[0]);
   };
 
   const handleDeleteBoard = async (boardId: string) => {
@@ -76,34 +82,26 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                 <GameBoard scale={boardScale} boardId={focusedBoard.id} />
               </>
             ) : (
-              <>
-                <p>There are no active boards for this campaign.</p>
-                {/*{isUserDm && <CreateGameBoard />}*/}
-              </>
+              <p>There are no active boards for this campaign.</p>
             )}
           </div>
           <div className="w-20 h-full flex flex-col items-center">
             {focusedBoard?.id && (
               <>
-                {/*<SearchIcon />*/}
-                {/*<Slider*/}
-                {/*  sx={{*/}
-                {/*    height: 100,*/}
-                {/*  }}*/}
-                {/*  orientation={'vertical'}*/}
-                {/*  value={boardScale}*/}
-                {/*  onChange={handleMagnify}*/}
-                {/*  defaultValue={1}*/}
-                {/*  min={0.3}*/}
-                {/*  max={3}*/}
-                {/*  step={0.0001}*/}
-                {/*/>*/}
-                <Button
-                  variant={'destructive'}
-                  onClick={() => handleDeleteBoard(focusedBoard.id)}
-                >
-                  Delete Board
-                </Button>
+                <SearchIcon />
+                <Slider
+                  defaultValue={[1]}
+                  min={0.3}
+                  max={3}
+                  step={0.0001}
+                  onValueChange={handleMagnify}
+                />
+                {/*<Button*/}
+                {/*  variant={'destructive'}*/}
+                {/*  onClick={() => handleDeleteBoard(focusedBoard.id)}*/}
+                {/*>*/}
+                {/*  Delete Board*/}
+                {/*</Button>*/}
               </>
             )}
           </div>
