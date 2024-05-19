@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { doc, setDoc } from '@firebase/firestore';
-import db from '@/app/firebase';
+import db, { storage } from '@/app/firebase';
 import { generateUUID } from '@/utils/uuid';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -18,20 +18,19 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import NextImage from 'next/image';
-import { useToast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
+import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 
 const CreateToken = () => {
   const { user } = useUser();
-  const { toast } = useToast();
-
-  const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const [tokenImage, setTokenImage] = useState(null);
+  const [tokenImgPreview, setTokenImgPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof createTokenSchema>>({
     resolver: zodResolver(createTokenSchema),
     defaultValues: {
       title: '',
-      tokenImg: undefined,
+      tokenImg: null,
     },
   });
 
@@ -39,33 +38,37 @@ const CreateToken = () => {
   const handleCreateToken = async (
     values: z.infer<typeof createTokenSchema>
   ) => {
-    try {
-      if (!user) {
-        console.error('An unauthenticated user cannot create tokens.');
-        return;
-      }
-
-      const newToken: GameBoardToken = {
-        id: generateUUID(),
-        title: values.title,
-        tokenImgURL: values.tokenImg,
-        ownerId: user.uid,
-      };
-
-      const docRef = doc(db, 'tokens', newToken.id);
-      await setDoc(docRef, newToken);
-
-      if (imgPreview) {
-        //uploadToS3
-        console.log(imgPreview);
-      }
-    } catch (e) {
-      console.error(e);
-      toast({
-        title: 'Critical Fail',
-        description: 'An error occurred while creating your token.',
-      });
+    if (!user) {
+      return;
     }
+
+    let tokenImgURL = null;
+    const id = generateUUID();
+
+    if (tokenImage) {
+      const imageRef = ref(storage, `token/${values.title}-${id}`);
+      await uploadBytes(imageRef, tokenImage);
+      tokenImgURL = await getDownloadURL(imageRef);
+    }
+
+    const newToken: GameBoardToken = {
+      id: id,
+      title: values.title,
+      tokenImgURL: tokenImgURL,
+      ownerId: user.uid,
+    };
+
+    const docRef = doc(db, 'tokens', newToken.id);
+    await setDoc(docRef, newToken);
+  };
+
+  const handleUploadFile = (e: any) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(e.target.files[0]);
+    img.onload = () => {
+      setTokenImgPreview(img.src);
+      setTokenImage(e.target.files[0]);
+    };
   };
 
   // TODO: Accept prop can be bypassed, ensure that users can only upload png/jpeg as avatar
@@ -95,18 +98,25 @@ const CreateToken = () => {
             <FormItem>
               <FormLabel>Token Image</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                {/* @ts-ignore */}
+                <Input
+                  type="file"
+                  placeholder="shadcn"
+                  accept=".jpg, .jpeg, .png"
+                  {...field}
+                  onChange={handleUploadFile}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {imgPreview && (
+        {tokenImgPreview && (
           <NextImage
-            src={imgPreview}
+            src={tokenImgPreview}
             width={100}
             height={100}
-            alt="Background Image Preview"
+            alt="Token Image Preview"
           />
         )}
         <Button type="submit">Submit</Button>

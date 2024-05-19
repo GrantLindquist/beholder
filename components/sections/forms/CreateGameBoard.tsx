@@ -20,10 +20,14 @@ import { GameBoardType } from '@/types/GameBoardTypes';
 import NextImage from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
+import db, { storage } from '@/app/firebase';
+import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
   const [bgPreview, setBgPreview] = useState<string | null>(null);
+  const [bgImage, setBgImage] = useState(null);
   // Width divided by height
   const [bgRatio, setBgRatio] = useState<number | null>(null);
 
@@ -31,7 +35,7 @@ const CreateGameBoard = () => {
     resolver: zodResolver(createGameBoardSchema),
     defaultValues: {
       title: undefined,
-      backgroundImg: undefined,
+      backgroundImg: null,
       width: DEFAULT_BOARD_SIZE,
       height: DEFAULT_BOARD_SIZE,
     },
@@ -42,27 +46,32 @@ const CreateGameBoard = () => {
   ) => {
     // props.closeDropdownMenu();
 
+    let backgroundImgURL = null;
+    const id = generateUUID();
+
+    if (bgImage) {
+      const imageRef = ref(storage, `board/${values.title}-${id}`);
+      await uploadBytes(imageRef, bgImage);
+      backgroundImgURL = await getDownloadURL(imageRef);
+    }
+
     const newBoard: GameBoardType = {
-      id: generateUUID(),
+      id: id,
       title: values.title,
       width: values.width,
       height: values.height,
       activeTokens: [],
-      ...(values.backgroundImg && { backgroundImgURL: values.backgroundImg }),
+      backgroundImgURL: backgroundImgURL,
     };
 
     if (campaign) {
-      // const boardDoc = doc(db, 'gameBoards', newBoard.id);
-      // await setDoc(boardDoc, newBoard);
-      //
-      // const campaignRef = doc(db, 'campaigns', campaign.id);
-      // await updateDoc(campaignRef, {
-      //   boardIds: arrayUnion(newBoard.id),
-      // });
+      const boardDoc = doc(db, 'gameBoards', newBoard.id);
+      await setDoc(boardDoc, newBoard);
 
-      if (bgPreview) {
-        // uploadToS3(bgPreview);
-      }
+      const campaignRef = doc(db, 'campaigns', campaign.id);
+      await updateDoc(campaignRef, {
+        boardIds: arrayUnion(newBoard.id),
+      });
     }
   };
 
@@ -75,6 +84,7 @@ const CreateGameBoard = () => {
       form.setValue('width', DEFAULT_BOARD_SIZE);
       form.setValue('height', Math.round(DEFAULT_BOARD_SIZE / ratio));
       setBgPreview(img.src);
+      setBgImage(e.target.files[0]);
     };
   };
 
@@ -124,7 +134,7 @@ const CreateGameBoard = () => {
               <FormLabel>Background Image</FormLabel>
               <FormControl>
                 {/* @ts-ignore */}
-                <input
+                <Input
                   type="file"
                   placeholder="shadcn"
                   accept=".jpg, .jpeg, .png"

@@ -81,10 +81,7 @@
 }
 
 #game-board {
- display: grid;
-}
-#game-board > * {
- border: 1px solid black;
+  display: grid;
 }
 
 .progress-container {
@@ -92,6 +89,9 @@
   height: 5px;
   background-color: rgba(255, 255, 255, .1);
   overflow: hidden;
+  position: absolute;
+  top: 0;
+  z-index: 3;
 }
 
 .progress-bar {

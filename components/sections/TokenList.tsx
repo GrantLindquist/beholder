@@ -36,6 +36,7 @@ const TokenList = () => {
           id: doc.id,
           title: doc.data().title,
           ownerId: doc.data().ownerId,
+          tokenImgURL: doc.data().tokenImgURL,
         }));
         setTokens(tokens);
       });

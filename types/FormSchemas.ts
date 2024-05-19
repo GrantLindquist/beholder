@@ -19,5 +19,5 @@ export const createTokenSchema = z.object({
   title: z.string().max(50, {
     message: `Woah, you sure typed a lot. Let's be a bit more concise, yeah?`,
   }),
-  tokenImg: z.string().nullable(),
+  tokenImg: z.string().nullish(),
 });

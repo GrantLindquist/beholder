@@ -18,6 +18,7 @@ import { useUser } from '@/hooks/useUser';
 import { useLoader } from '@/hooks/useLoader';
 import { SearchIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { load } = useLoader();
@@ -57,6 +58,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
     setBoardScale(newValue[0]);
   };
 
+  // TODO: Delete applicable bgImage from cloud storage
   const handleDeleteBoard = async (boardId: string) => {
     if (campaign) {
       // Delete from game_boards
@@ -96,12 +98,12 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                   step={0.0001}
                   onValueChange={handleMagnify}
                 />
-                {/*<Button*/}
-                {/*  variant={'destructive'}*/}
-                {/*  onClick={() => handleDeleteBoard(focusedBoard.id)}*/}
-                {/*>*/}
-                {/*  Delete Board*/}
-                {/*</Button>*/}
+                <Button
+                  variant={'destructive'}
+                  onClick={() => handleDeleteBoard(focusedBoard.id)}
+                >
+                  Delete Board
+                </Button>
               </>
             )}
           </div>

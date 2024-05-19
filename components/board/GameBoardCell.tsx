@@ -20,7 +20,11 @@ export const GameBoardCell = ({
   });
 
   return (
-    <div onClick={onClick} ref={setNodeRef} className="size-12 bg-stone-900">
+    <div
+      onClick={onClick}
+      ref={setNodeRef}
+      className="size-12 border border-gray-600"
+    >
       {children}
     </div>
   );

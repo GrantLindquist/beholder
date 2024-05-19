@@ -15,14 +15,15 @@ import { useCampaign } from '@/hooks/useCampaign';
 import GameToken from '@/components/board/GameToken';
 import { closestCorners, DndContext } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
+import { CELL_SIZE } from '@/app/globals';
+import Image from 'next/image';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
+  const { campaign } = useCampaign();
   const [board, setBoard] = useState<GameBoardType>();
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
   );
-
-  const { campaign } = useCampaign();
 
   // Subscribe to receive live board updates
   useEffect(() => {
@@ -90,6 +91,9 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     await moveToken(coords);
   };
 
+  // TODO: Make bg stretch to always perfectly fit cell grid
+  // TODO: Image caching?
+  // TODO: Investigate glitch where token duplicates upon moving a lot via click
   return (
     <>
       {board && (
@@ -98,36 +102,51 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
           collisionDetection={closestCorners}
         >
           <h1>{_.get(campaign, 'title')}</h1>
-          <div id="game-board">
-            {Array.from({ length: board.height }, (__, rowIndex) =>
-              Array.from({ length: board.width }, (__, colIndex) => {
-                const token = board.activeTokens.find(
-                  (token) =>
-                    token.boardPosition[0] === colIndex &&
-                    token.boardPosition[1] === rowIndex
-                );
-                return (
-                  <div key={`${colIndex},${rowIndex}`}>
-                    <GameBoardCell
-                      token={token || null}
-                      onClick={() =>
-                        handleCellClick([colIndex, rowIndex], token || null)
-                      }
-                      droppableId={`${colIndex},${rowIndex}`}
-                    >
-                      {token ? (
-                        <GameToken
-                          token={token}
-                          selected={movingToken?.id === token.id}
-                        />
-                      ) : (
-                        <></>
-                      )}
-                    </GameBoardCell>
-                  </div>
-                );
-              })
+          <div
+          // style={{
+          //   transform: `scale(${props.scale})`,
+          // }}
+          >
+            {board?.backgroundImgURL && (
+              <Image
+                src={board.backgroundImgURL}
+                width={CELL_SIZE * board.width}
+                height={CELL_SIZE * board.height}
+                alt={`${board.title}'s Background Image`}
+                className="absolute top-0 right-0"
+              />
             )}
+            <div id="game-board" className="absolute top-0 right-0">
+              {Array.from({ length: board.height }, (__, rowIndex) =>
+                Array.from({ length: board.width }, (__, colIndex) => {
+                  const token = board.activeTokens.find(
+                    (token) =>
+                      token.boardPosition[0] === colIndex &&
+                      token.boardPosition[1] === rowIndex
+                  );
+                  return (
+                    <div key={`${colIndex},${rowIndex}`}>
+                      <GameBoardCell
+                        token={token || null}
+                        onClick={() =>
+                          handleCellClick([colIndex, rowIndex], token || null)
+                        }
+                        droppableId={`${colIndex},${rowIndex}`}
+                      >
+                        {token ? (
+                          <GameToken
+                            token={token}
+                            selected={movingToken?.id === token.id}
+                          />
+                        ) : (
+                          <></>
+                        )}
+                      </GameBoardCell>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </DndContext>
       )}
