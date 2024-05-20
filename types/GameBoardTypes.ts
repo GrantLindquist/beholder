@@ -18,12 +18,13 @@ export interface GameBoardToken {
   title: string;
   ownerId: string;
   tokenImgURL: string | null;
+  isMonster?: boolean;
 }
 
 export interface ActiveGameBoardToken extends GameBoardToken {
   boardPosition: [number, number];
   lastMovedAt: number | null;
-  isPlayer: boolean;
+  monsterNumber?: number;
 }
 
 export interface CampaignPreview {

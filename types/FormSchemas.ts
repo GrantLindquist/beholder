@@ -20,4 +20,5 @@ export const createTokenSchema = z.object({
     message: `Woah, you sure typed a lot. Let's be a bit more concise, yeah?`,
   }),
   tokenImg: z.string().nullish(),
+  isMonster: z.boolean(),
 });

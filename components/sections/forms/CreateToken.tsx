@@ -20,9 +20,12 @@ import { Input } from '@/components/ui/input';
 import NextImage from 'next/image';
 import { useUser } from '@/hooks/useUser';
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
+import { useCampaign } from '@/hooks/useCampaign';
+import { Switch } from '@/components/ui/switch';
 
 const CreateToken = () => {
   const { user } = useUser();
+  const { isUserDm } = useCampaign();
   const [tokenImage, setTokenImage] = useState(null);
   const [tokenImgPreview, setTokenImgPreview] = useState<string | null>(null);
 
@@ -31,6 +34,7 @@ const CreateToken = () => {
     defaultValues: {
       title: '',
       tokenImg: null,
+      isMonster: isUserDm || false,
     },
   });
 
@@ -56,6 +60,7 @@ const CreateToken = () => {
       title: values.title,
       tokenImgURL: tokenImgURL,
       ownerId: user.uid,
+      isMonster: values.isMonster,
     };
 
     const docRef = doc(db, 'tokens', newToken.id);
@@ -76,7 +81,7 @@ const CreateToken = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleCreateToken)}
-        className="space-y-1"
+        className="space-y-4"
       >
         <FormField
           control={form.control}
@@ -117,6 +122,27 @@ const CreateToken = () => {
             width={100}
             height={100}
             alt="Token Image Preview"
+          />
+        )}
+        {isUserDm && (
+          <FormField
+            control={form.control}
+            name="isMonster"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex flex-row items-center">
+                  <FormLabel className="flex-grow">Is Monster</FormLabel>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </div>
+
+                <FormMessage />
+              </FormItem>
+            )}
           />
         )}
         <Button type="submit">Submit</Button>

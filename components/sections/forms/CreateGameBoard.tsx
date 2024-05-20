@@ -111,7 +111,7 @@ const CreateGameBoard = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleCreateBoard)}
-        className="space-y-1 p-4"
+        className="space-y-4"
       >
         <FormField
           control={form.control}
