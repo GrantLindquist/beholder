@@ -7,6 +7,7 @@ import './globals.css';
 import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
 import { UserProvider } from '@/hooks/useUser';
 import { LoadingProvider } from '@/hooks/useLoader';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,11 +26,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           defaultTheme="dark"
         >
           <LoadingProvider>
-            <UserProvider>
-              <CampaignProvider>
-                <FocusedBoardProvider>{children}</FocusedBoardProvider>
-              </CampaignProvider>
-            </UserProvider>
+            <TooltipProvider delayDuration={500}>
+              <UserProvider>
+                <CampaignProvider>
+                  <FocusedBoardProvider>{children}</FocusedBoardProvider>
+                </CampaignProvider>
+              </UserProvider>
+            </TooltipProvider>
           </LoadingProvider>
         </ThemeProvider>
       </body>

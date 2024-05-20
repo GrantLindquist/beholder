@@ -103,7 +103,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                   onClick={() => handleDeleteBoard(focusedBoard.id)}
                   className="relative bottom-0"
                 >
-                  Delete Board
+                  Delete
                 </Button>
               </>
             )}

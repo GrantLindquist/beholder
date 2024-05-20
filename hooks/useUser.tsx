@@ -23,13 +23,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchUser = async () => {
       const session = await getUserFromSession();
-      const sessionUser = session.user;
-      setUser({
-        displayName: sessionUser.displayName,
-        email: sessionUser.email,
-        photoURL: sessionUser.photoURL,
-        uid: sessionUser.uid,
-      });
+      const sessionUser = session?.user || null;
+      if (sessionUser) {
+        setUser({
+          displayName: sessionUser.displayName,
+          email: sessionUser.email,
+          photoURL: sessionUser.photoURL,
+          uid: sessionUser.uid,
+        });
+      }
     };
 
     load(fetchUser(), 'An error occurred while loading the user.');

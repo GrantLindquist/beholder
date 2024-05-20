@@ -7,7 +7,6 @@ import ActivePlayerList from '@/components/sections/ActivePlayerList';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
@@ -33,42 +32,43 @@ const SideNavbar = () => {
   const { isUserDm } = useCampaign();
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-20 flex flex-col bg-stone-900 shadow-lg p-2">
+    <div className="fixed top-0 left-0 h-screen w-20 flex flex-col items-center bg-gray-900 shadow-lg p-2">
       <Link
         href={'/'}
-        className="bg-stone-800 m-1.5 h-12 hover:bg-purple-800 flex items-center justify-center"
+        className="bg-gray-700 m-1.5 h-12 hover:bg-purple-800 flex items-center justify-center"
       >
         <DoorOpen />
       </Link>
-      <Separator className="my-2 bg-stone-600" />
+      <Separator className="my-2 bg-gray-700" />
+      <div className="flex-grow">
+        <SideNavbarIcon title={'Game Boards'} icon={<Table />}>
+          <DropdownMenuLabel>Game Boards</DropdownMenuLabel>
+          <GameBoardList />
+          <Collapsible>
+            <CollapsibleTrigger>
+              <DropdownMenuLabel>Create New Board</DropdownMenuLabel>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CreateGameBoard />
+            </CollapsibleContent>
+          </Collapsible>
+        </SideNavbarIcon>
 
-      <SideNavbarIcon title={'Game Boards'} icon={<Table />}>
-        <DropdownMenuLabel>Game Boards</DropdownMenuLabel>
-        <GameBoardList />
-        <Collapsible>
-          <CollapsibleTrigger>
-            <DropdownMenuLabel>Create New Board</DropdownMenuLabel>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CreateGameBoard />
-          </CollapsibleContent>
-        </Collapsible>
-      </SideNavbarIcon>
-
-      <SideNavbarIcon title={'Game Tokens'} icon={<SmilePlus />}>
-        <DropdownMenuLabel>Your Tokens</DropdownMenuLabel>
-        <TokenList />
-        <Collapsible>
-          <CollapsibleTrigger>
-            <DropdownMenuLabel>Create New Token</DropdownMenuLabel>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CreateToken />
-          </CollapsibleContent>
-        </Collapsible>
-      </SideNavbarIcon>
-      <SideNavbarIcon title={'Paint'} icon={<Pencil />}></SideNavbarIcon>
-      <div className="bottom-0">
+        <SideNavbarIcon title={'Game Tokens'} icon={<SmilePlus />}>
+          <DropdownMenuLabel>Your Tokens</DropdownMenuLabel>
+          <TokenList />
+          <Collapsible>
+            <CollapsibleTrigger>
+              <DropdownMenuLabel>Create New Token</DropdownMenuLabel>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CreateToken />
+            </CollapsibleContent>
+          </Collapsible>
+        </SideNavbarIcon>
+        <SideNavbarIcon title={'Paint'} icon={<Pencil />}></SideNavbarIcon>
+      </div>
+      <div className="mb-4">
         <ActivePlayerList />
       </div>
     </div>
@@ -89,18 +89,16 @@ const SideNavbarIcon = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <TooltipProvider delayDuration={500}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button className="bg-stone-800 m-1.5 h-12 hover:bg-purple-800 text-white">
-                {icon}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="bg-stone-800" side="right">
-              <h6 className="font-semibold">{title}</h6>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button className="bg-gray-700 m-1.5 h-12 hover:bg-purple-800 text-white">
+              {icon}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <h6 className="font-semibold">{title}</h6>
+          </TooltipContent>
+        </Tooltip>
       </DropdownMenuTrigger>
       {children && (
         <DropdownMenuContent className="max-w-96" side="right">
