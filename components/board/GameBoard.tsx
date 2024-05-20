@@ -17,6 +17,7 @@ import { closestCorners, DndContext } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
+import TokenContextMenu from '@/components/sections/TokenContextMenu';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const { campaign } = useCampaign();
@@ -132,13 +133,16 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                         }
                         droppableId={`${colIndex},${rowIndex}`}
                       >
-                        {token ? (
-                          <GameToken
+                        {token && (
+                          <TokenContextMenu
+                            nullifySelection={() => setMovingToken(null)}
                             token={token}
-                            selected={movingToken?.id === token.id}
-                          />
-                        ) : (
-                          <></>
+                          >
+                            <GameToken
+                              token={token}
+                              selected={movingToken?.id === token.id}
+                            />
+                          </TokenContextMenu>
                         )}
                       </GameBoardCell>
                     </div>

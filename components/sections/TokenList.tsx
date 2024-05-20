@@ -68,7 +68,6 @@ const TokenList = () => {
           <div onClick={() => setSelectedToken(token)}>
             <GameToken token={token} />
           </div>
-          <p>{token.title}</p>
         </div>
       ))}
       {selectedToken && focusedBoard?.id && (

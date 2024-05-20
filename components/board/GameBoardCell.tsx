@@ -16,6 +16,7 @@ export const GameBoardCell = ({
     id: droppableId,
   });
 
+  // TODO: Make sure that cells cannot constrict
   return (
     <div
       onClick={onClick}

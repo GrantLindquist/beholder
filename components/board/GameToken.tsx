@@ -15,19 +15,23 @@ const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      className={getSelectedClass()}
-      {...(props.selected && listeners)}
-      {...(props.selected && attributes)}
-    >
-      <Image
-        src={props.token.tokenImgURL || DEFAULT_AVATAR}
-        alt={props.token.title}
-        height={CELL_SIZE}
-        width={CELL_SIZE}
-      />
-      {/*<p>{props.token.title}</p>*/}
+    <div>
+      <div
+        ref={setNodeRef}
+        className={getSelectedClass()}
+        {...(props.selected && listeners)}
+        {...(props.selected && attributes)}
+      >
+        <Image
+          src={props.token.tokenImgURL || DEFAULT_AVATAR}
+          alt={props.token.title}
+          height={CELL_SIZE}
+          width={CELL_SIZE}
+        />
+      </div>
+      <div className="bg-gray-300 bg-opacity-70 text-zinc-950 rounded relative w-fit mt-1">
+        <p className="text-xs text-center px-1.5">{props.token.title}</p>
+      </div>
     </div>
   );
 };
