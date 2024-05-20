@@ -1,17 +1,14 @@
-import { GameBoardToken } from '@/types/GameBoardTypes';
 import { ReactNode } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
 type GameBoardCellProps = {
   onClick: () => void;
-  token: GameBoardToken | null;
   droppableId: string;
   children: ReactNode;
 };
 
 export const GameBoardCell = ({
   onClick,
-  token,
   children,
   droppableId,
 }: GameBoardCellProps) => {

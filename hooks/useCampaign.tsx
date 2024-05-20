@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { CampaignType } from '@/types/GameBoardTypes';
-import { arrayUnion, doc, getDoc, updateDoc } from '@firebase/firestore';
+import { doc, getDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 
 const CampaignContext = createContext<{
@@ -38,11 +38,6 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
       userId === campaignDocSnap.data().dmId
         ? setIsUserDm(true)
         : setIsUserDm(false);
-
-      // TODO: Figure out best way to remove activePlayerIds
-      await updateDoc(campaignDocRef, {
-        activePlayerIds: arrayUnion(userId),
-      });
     } else {
       console.error(
         'Encountered issue while trying to load campaign of id: ' + campaignId

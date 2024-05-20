@@ -101,6 +101,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                 <Button
                   variant={'destructive'}
                   onClick={() => handleDeleteBoard(focusedBoard.id)}
+                  className="relative bottom-0"
                 >
                   Delete Board
                 </Button>

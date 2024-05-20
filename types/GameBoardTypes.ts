@@ -1,4 +1,5 @@
-// TODO: Investigate whether having ids in types causes db mismatch
+import { UserSession } from '@/types/UserTypes';
+
 export interface GameBoardBase {
   id: string;
   title: string;
@@ -35,5 +36,5 @@ export interface CampaignType extends CampaignPreview {
   boardIds: string[];
   dmId: string;
   playerIds: string[];
-  activePlayerIds?: string[];
+  activePlayers?: UserSession[];
 }

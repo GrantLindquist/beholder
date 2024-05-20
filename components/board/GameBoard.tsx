@@ -127,7 +127,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
                       <GameBoardCell
-                        token={token || null}
                         onClick={() =>
                           handleCellClick([colIndex, rowIndex], token || null)
                         }

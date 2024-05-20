@@ -16,6 +16,12 @@ module.exports = {
         port: '',
         pathname: '/v0/b/beholder-10cfd.appspot.com/o/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/a/**',
+      },
     ],
   },
 };
