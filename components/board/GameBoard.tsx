@@ -109,6 +109,8 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
           // }}
           >
             {board?.backgroundImgURL && (
+              // TODO: Fix AspectRatio - currently hides child image
+              // <AspectRatio ratio={board.width / board.height}>
               <Image
                 src={board.backgroundImgURL}
                 width={CELL_SIZE * board.width}
@@ -116,6 +118,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                 alt={`${board.title}'s Background Image`}
                 className="absolute top-0 right-0"
               />
+              // </AspectRatio>
             )}
             <div id="game-board" className="absolute top-0 right-0">
               {Array.from({ length: board.height }, (__, rowIndex) =>

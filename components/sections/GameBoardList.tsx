@@ -35,25 +35,32 @@ const GameBoardList = () => {
       return () => unsubscribe();
     };
 
-    load(fetchBoards(), 'An error occurred while fetching your boards.');
+    _.size(campaign?.boardIds) > 0 &&
+      load(fetchBoards(), 'An error occurred while fetching your boards.');
   }, [user]);
 
   return (
     <>
-      {_.map(boards, (board) => {
-        if (board.id !== focusedBoard?.id) {
-          return (
-            <div key={board.id}>
-              <Button
-                variant={'outline'}
-                onClick={() => setFocusedBoardId(board.id)}
-              >
-                {board.title}
-              </Button>
-            </div>
-          );
-        }
-      })}
+      {_.size(campaign?.boardIds) > 0 ? (
+        <>
+          {_.map(boards, (board) => {
+            if (board.id !== focusedBoard?.id) {
+              return (
+                <div key={board.id}>
+                  <Button
+                    variant={'outline'}
+                    onClick={() => setFocusedBoardId(board.id)}
+                  >
+                    {board.title}
+                  </Button>
+                </div>
+              );
+            }
+          })}
+        </>
+      ) : (
+        <p className="text-xs text-gray-500">N/A</p>
+      )}
     </>
   );
 };

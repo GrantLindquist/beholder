@@ -25,6 +25,7 @@ import CreateGameBoard from '@/components/sections/forms/CreateGameBoard';
 import CreateToken from '@/components/sections/forms/CreateToken';
 import TokenList from '@/components/sections/TokenList';
 import GameBoardList from '@/components/sections/GameBoardList';
+import SettingsMenu from '@/components/sections/SettingsMenu';
 
 // TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
@@ -66,7 +67,7 @@ const SideNavbar = () => {
         <SideNavbarIcon title={'Paint'} icon={<Pencil />}></SideNavbarIcon>
         <SideNavbarIcon title={'Settings'} icon={<Settings />}>
           <DropdownMenuLabel>Settings</DropdownMenuLabel>
-          <Settings />
+          <SettingsMenu />
         </SideNavbarIcon>
       </div>
       <div className="mb-4">
