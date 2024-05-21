@@ -22,6 +22,7 @@ import { useUser } from '@/hooks/useUser';
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 import { useCampaign } from '@/hooks/useCampaign';
 import { Switch } from '@/components/ui/switch';
+import InfoTooltip from '@/components/misc/InfoTooltip';
 
 const CreateToken = () => {
   const { user } = useUser();
@@ -76,7 +77,7 @@ const CreateToken = () => {
     };
   };
 
-  // TODO: Accept prop can be bypassed, ensure that users can only upload png/jpeg as avatar
+  // TODO: Create a info tooltip component for describing things that aren't inherently obvious
   return (
     <Form {...form}>
       <form
@@ -131,7 +132,12 @@ const CreateToken = () => {
             render={({ field }) => (
               <FormItem>
                 <div className="flex flex-row items-center">
-                  <FormLabel className="flex-grow">Is Monster</FormLabel>
+                  <div className="flex items-center space-x-1 flex-grow">
+                    <FormLabel>Is Monster?</FormLabel>
+                    <InfoTooltip
+                      description={`A "Monster" token can be duplicated on the board.`}
+                    />
+                  </div>
                   <FormControl>
                     <Switch
                       checked={field.value}

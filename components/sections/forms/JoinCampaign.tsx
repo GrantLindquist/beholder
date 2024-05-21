@@ -8,6 +8,7 @@ import { arrayUnion, doc, getDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import { useUser } from '@/hooks/useUser';
 import { useRouter } from 'next/navigation';
+import InfoTooltip from '@/components/misc/InfoTooltip';
 
 const JoinCampaign = () => {
   const { load } = useLoader();
@@ -49,7 +50,16 @@ const JoinCampaign = () => {
       }
       className="m-2"
     >
-      <div className="flex flex-row items-center space-x-4">
+      <div className="flex flex-row items-center space-x-2">
+        <InfoTooltip
+          description={
+            <p>
+              This can be found by going to{' '}
+              <strong>{`Settings > Campaign Id`}</strong> within your desired
+              campaign.
+            </p>
+          }
+        />
         <Input placeholder="Campaign Id" />
         <Button type="submit">Submit</Button>
       </div>
