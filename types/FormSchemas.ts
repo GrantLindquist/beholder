@@ -22,3 +22,12 @@ export const createTokenSchema = z.object({
   tokenImg: z.string().nullish(),
   isMonster: z.boolean(),
 });
+
+export const createCampaignSchema = z.object({
+  title: z.string().max(50, {
+    message: `Woah, you sure typed a lot. Let's be a bit more concise, yeah?`,
+  }),
+  description: z.string().max(500, {
+    message: `Woah, you sure typed a lot. Let's be a bit more concise, yeah?`,
+  }),
+});

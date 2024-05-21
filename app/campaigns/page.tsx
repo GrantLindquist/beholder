@@ -16,6 +16,13 @@ import { setUserSession } from '@/utils/userSession';
 import { UserFunctional, UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
 import { useLoader } from '@/hooks/useLoader';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import JoinCampaign from '@/components/sections/forms/JoinCampaign';
+import CreateCampaign from '@/components/sections/forms/CreateCampaign';
 
 export default function Campaigns() {
   const { user } = useUser();
@@ -51,6 +58,8 @@ export default function Campaigns() {
 
   const handleSignOut = async () => {
     await signOut(auth);
+
+    // TODO: Complete sign-out w/ userSession and useUser
   };
 
   useEffect(() => {
@@ -74,8 +83,22 @@ export default function Campaigns() {
         <>
           <CampaignList campaignIds={campaignIds} />
           <div className="flex flex-row gap-4">
-            <Button variant="outline">Join Campaign</Button>
-            <Button variant="outline">Create Campaign</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant="outline">Join Campaign</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" className="m-2">
+                <JoinCampaign />
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant="outline">Create Campaign</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" className="m-2">
+                <CreateCampaign />
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" onClick={handleSignOut}>
               Sign-out
             </Button>

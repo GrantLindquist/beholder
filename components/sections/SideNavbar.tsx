@@ -1,8 +1,7 @@
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { DoorOpen, Pencil, SmilePlus, Table } from 'lucide-react';
+import { DoorOpen, Pencil, Settings, SmilePlus, Table } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { useCampaign } from '@/hooks/useCampaign';
 import ActivePlayerList from '@/components/sections/ActivePlayerList';
 import {
   Tooltip,
@@ -29,8 +28,6 @@ import GameBoardList from '@/components/sections/GameBoardList';
 
 // TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
-  const { isUserDm } = useCampaign();
-
   return (
     <div className="fixed top-0 left-0 h-screen w-20 flex flex-col items-center bg-gray-900 shadow-lg p-2">
       <Link
@@ -67,6 +64,10 @@ const SideNavbar = () => {
           </Collapsible>
         </SideNavbarIcon>
         <SideNavbarIcon title={'Paint'} icon={<Pencil />}></SideNavbarIcon>
+        <SideNavbarIcon title={'Settings'} icon={<Settings />}>
+          <DropdownMenuLabel>Settings</DropdownMenuLabel>
+          <Settings />
+        </SideNavbarIcon>
       </div>
       <div className="mb-4">
         <ActivePlayerList />
