@@ -12,12 +12,12 @@ import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
-import GameToken from '@/components/board/GameToken';
 import { closestCorners, DndContext } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
 import TokenContextMenu from '@/components/sections/TokenContextMenu';
+import ActiveGameToken from '@/components/board/ActiveGameToken';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const { campaign } = useCampaign();
@@ -137,11 +137,12 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                         droppableId={`${colIndex},${rowIndex}`}
                       >
                         {token && (
+                          // TODO: Change TokenContextMenu into CellContextMenu and dynamically render options based on token occupancy
                           <TokenContextMenu
                             nullifySelection={() => setMovingToken(null)}
                             token={token}
                           >
-                            <GameToken
+                            <ActiveGameToken
                               token={token}
                               selected={movingToken?.id === token.id}
                             />

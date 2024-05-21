@@ -30,10 +30,14 @@ const CopyCampaignId = () => {
           {campaign?.id || 'N/A'}
         </p>
         <Button variant="ghost" onClick={handleCopyCampaignId}>
-          {isCopied ? <Check size={16} /> : <ClipboardIcon size={16} />}
+          {isCopied ? (
+            <Check color="#90EE90" size={16} />
+          ) : (
+            <ClipboardIcon size={16} />
+          )}
         </Button>
       </div>
-      {isCopied && <p className="text-xs">Copied!</p>}
+      <div className="text-xs">{isCopied ? <p>Copied!</p> : <p>&nbsp;</p>}</div>
     </>
   );
 };
