@@ -21,11 +21,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
+import { useCampaign } from '@/hooks/useCampaign';
 
 const TokenList = () => {
   const { user } = useUser();
   const { load } = useLoader();
   const { focusedBoard } = useFocusedBoard();
+  const { isUserDm } = useCampaign();
 
   const [tokens, setTokens] = useState<GameBoardToken[]>([]);
   const [selectedToken, setSelectedToken] = useState<GameBoardToken | null>();
@@ -113,6 +115,7 @@ const TokenList = () => {
       <div className="grid grid-cols-2 space-x-2 space-y-2">
         {tokens.map((token) => {
           if (
+            (isUserDm || !token.isMonster) &&
             token.title.toLowerCase().trim().includes(searchQuery.toLowerCase())
           ) {
             return (

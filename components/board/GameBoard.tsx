@@ -10,7 +10,6 @@ import {
 } from '@firebase/firestore';
 import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
-import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
 import { closestCorners, DndContext } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
@@ -95,6 +94,8 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   // TODO: Make bg stretch to always perfectly fit cell grid
   // TODO: Image caching?
   // TODO: Investigate glitch where token duplicates upon moving a lot via click
+  // TODO: Set default scale for board based on board size
+  // TODO: Some cells are cropped if board is too big (larger than ~23 height)
   return (
     <>
       {board && (
@@ -102,11 +103,12 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
           onDragEnd={handleDragToken}
           collisionDetection={closestCorners}
         >
-          <h1>{_.get(campaign, 'title')}</h1>
+          {/*<h1>{_.get(campaign, 'title')}</h1>*/}
           <div
-          // style={{
-          //   transform: `scale(${props.scale})`,
-          // }}
+            // style={{
+            //   transform: `scale(${props.scale})`,
+            // }}
+            className="w-dvw h-full relative flex items-center justify-center"
           >
             {board?.backgroundImgURL && (
               // TODO: Fix AspectRatio - currently hides child image
@@ -116,11 +118,11 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                 width={CELL_SIZE * board.width}
                 height={CELL_SIZE * board.height}
                 alt={`${board.title}'s Background Image`}
-                className="absolute top-0 right-0"
+                className="absolute"
               />
               // </AspectRatio>
             )}
-            <div id="game-board" className="absolute top-0 right-0">
+            <div id="game-board" className="absolute">
               {Array.from({ length: board.height }, (__, rowIndex) =>
                 Array.from({ length: board.width }, (__, colIndex) => {
                   const token = board.activeTokens.find(

@@ -76,28 +76,29 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
       {campaign ? (
-        <div className="flex">
+        <div className="w-screen h-screen flex flex-row">
           <SideNavbar />
           <div className="w-full h-full flex items-center justify-center">
             {focusedBoard?.id ? (
-              <>
-                <GameBoard scale={boardScale} boardId={focusedBoard.id} />
-              </>
+              <GameBoard scale={boardScale} boardId={focusedBoard.id} />
             ) : (
               <p>There are no active boards for this campaign.</p>
             )}
           </div>
-          <div className="w-20 h-full flex flex-col items-center">
+          <div className="fixed top-0 right-0 w-20 h-full flex flex-col z-10 items-center">
             {focusedBoard?.id && (
               <>
-                <SearchIcon />
-                <Slider
-                  defaultValue={[1]}
-                  min={0.3}
-                  max={3}
-                  step={0.0001}
-                  onValueChange={handleMagnify}
-                />
+                <div className="flex-grow my-4 space-y-2">
+                  <SearchIcon />
+                  <Slider
+                    defaultValue={[1]}
+                    min={0.3}
+                    max={3}
+                    step={0.0001}
+                    onValueChange={handleMagnify}
+                  />
+                </div>
+
                 <Button
                   variant={'destructive'}
                   onClick={() => handleDeleteBoard(focusedBoard.id)}

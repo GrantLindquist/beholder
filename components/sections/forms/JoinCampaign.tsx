@@ -40,6 +40,7 @@ const JoinCampaign = () => {
     }
   };
 
+  // TODO: The tooltip blocks the submit action (?)
   return (
     <form
       onSubmit={(event) =>
