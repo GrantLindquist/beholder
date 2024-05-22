@@ -18,7 +18,7 @@ import { useUser } from '@/hooks/useUser';
 import { useLoader } from '@/hooks/useLoader';
 import { SearchIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
+import { DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { load } = useLoader();
@@ -27,6 +27,15 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
 
   const [boardScale, setBoardScale] = useState(1);
+
+  useEffect(() => {
+    const smallestDimension = focusedBoard
+      ? focusedBoard?.width > focusedBoard?.height
+        ? focusedBoard?.width
+        : focusedBoard?.height
+      : DEFAULT_BOARD_HEIGHT_SCALE;
+    setBoardScale(DEFAULT_BOARD_HEIGHT_SCALE / smallestDimension);
+  }, [focusedBoard?.id]);
 
   useEffect(() => {
     const initializeCampaign = async () => {
@@ -85,27 +94,25 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
               <p>There are no active boards for this campaign.</p>
             )}
           </div>
-          <div className="fixed top-0 right-0 w-20 h-full flex flex-col z-10 items-center">
+          <div className="fixed top-0 right-0 w-32 my-3 mx-6 space-x-3 flex flex-row z-10 items-center">
             {focusedBoard?.id && (
               <>
-                <div className="flex-grow my-4 space-y-2">
-                  <SearchIcon />
-                  <Slider
-                    defaultValue={[1]}
-                    min={0.3}
-                    max={3}
-                    step={0.0001}
-                    onValueChange={handleMagnify}
-                  />
-                </div>
+                <SearchIcon />
+                <Slider
+                  defaultValue={[1]}
+                  min={0.3}
+                  max={3}
+                  step={0.0001}
+                  onValueChange={handleMagnify}
+                />
 
-                <Button
-                  variant={'destructive'}
-                  onClick={() => handleDeleteBoard(focusedBoard.id)}
-                  className="relative bottom-0"
-                >
-                  Delete
-                </Button>
+                {/*<Button*/}
+                {/*  variant={'destructive'}*/}
+                {/*  onClick={() => handleDeleteBoard(focusedBoard.id)}*/}
+                {/*  className="relative bottom-0"*/}
+                {/*>*/}
+                {/*  Delete*/}
+                {/*</Button>*/}
               </>
             )}
           </div>

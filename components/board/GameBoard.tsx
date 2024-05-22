@@ -91,11 +91,12 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     await moveToken(coords);
   };
 
+  console.log(props.scale);
+
   // TODO: Make bg stretch to always perfectly fit cell grid
   // TODO: Image caching?
   // TODO: Investigate glitch where token duplicates upon moving a lot via click
   // TODO: Set default scale for board based on board size
-  // TODO: Some cells are cropped if board is too big (larger than ~23 height)
   return (
     <>
       {board && (
@@ -105,9 +106,9 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
         >
           {/*<h1>{_.get(campaign, 'title')}</h1>*/}
           <div
-            // style={{
-            //   transform: `scale(${props.scale})`,
-            // }}
+            style={{
+              transform: `scale(${props.scale})`,
+            }}
             className="w-dvw h-full relative flex items-center justify-center"
           >
             {board?.backgroundImgURL && (
