@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
 type GameBoardCellProps = {
-  onMouseDown: () => void;
+  onMouseDown: (event: any) => void;
   isMovingToken: boolean;
   droppableId: string;
   children: ReactNode;

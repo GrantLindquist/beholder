@@ -115,12 +115,13 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
                       <GameBoardCell
-                        onMouseDown={() => setMovingToken(token ?? null)}
+                        onMouseDown={(event: any) => {
+                          event?.button === 0 && setMovingToken(token ?? null);
+                        }}
                         isMovingToken={!_.isNil(movingToken)}
                         droppableId={`${colIndex},${rowIndex}`}
                       >
                         {token && (
-                          // TODO: Change TokenContextMenu into CellContextMenu and dynamically render options based on token occupancy
                           <ActiveGameToken
                             token={token}
                             selected={movingToken?.id === token.id}
