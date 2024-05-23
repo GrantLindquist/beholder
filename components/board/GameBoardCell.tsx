@@ -2,13 +2,15 @@ import { ReactNode } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
 type GameBoardCellProps = {
-  onClick: () => void;
+  onMouseDown: () => void;
+  isMovingToken: boolean;
   droppableId: string;
   children: ReactNode;
 };
 
 export const GameBoardCell = ({
-  onClick,
+  onMouseDown,
+  isMovingToken,
   children,
   droppableId,
 }: GameBoardCellProps) => {
@@ -16,12 +18,16 @@ export const GameBoardCell = ({
     id: droppableId,
   });
 
+  const getHoverClass = () => {
+    return isMovingToken ? 'hover:bg-white hover:bg-opacity-20' : '';
+  };
+
   // TODO: Make sure that cells cannot constrict
   return (
     <div
-      onClick={onClick}
+      onMouseDown={onMouseDown}
       ref={setNodeRef}
-      className="size-12 border border-gray-600"
+      className={`size-12 border border-white border-opacity-20 ${getHoverClass()}`}
     >
       {children}
     </div>

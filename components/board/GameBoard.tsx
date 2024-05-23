@@ -11,12 +11,12 @@ import {
 import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import { useCampaign } from '@/hooks/useCampaign';
-import { closestCorners, DndContext } from '@dnd-kit/core';
+import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
-import TokenContextMenu from '@/components/sections/TokenContextMenu';
 import ActiveGameToken from '@/components/board/ActiveGameToken';
+import _ from 'lodash';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const { campaign } = useCampaign();
@@ -52,35 +52,19 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
 
   const moveToken = async (coords: [number, number]) => {
     const docRef = doc(db, 'gameBoards', props.boardId);
+    const movingTokenRef = _.cloneDeep(movingToken);
+    setMovingToken(null);
 
     await updateDoc(docRef, {
-      activeTokens: arrayRemove(movingToken),
+      activeTokens: arrayRemove(movingTokenRef),
     });
 
     await updateDoc(docRef, {
       activeTokens: arrayUnion({
-        ...movingToken,
+        ...movingTokenRef,
         boardPosition: coords,
       }),
     });
-
-    setMovingToken(null);
-  };
-
-  const handleCellClick = async (
-    coords: [number, number],
-    token: ActiveGameBoardToken | null
-  ) => {
-    if (movingToken) {
-      if (
-        movingToken.boardPosition[0] !== coords[0] ||
-        movingToken.boardPosition[1] !== coords[1]
-      ) {
-        await moveToken(coords);
-      }
-    } else {
-      setMovingToken(token);
-    }
   };
 
   const handleDragToken = async (event: any) => {
@@ -91,20 +75,17 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     await moveToken(coords);
   };
 
-  console.log(props.scale);
-
   // TODO: Make bg stretch to always perfectly fit cell grid
   // TODO: Image caching?
   // TODO: Investigate glitch where token duplicates upon moving a lot via click
-  // TODO: Set default scale for board based on board size
   return (
+    // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>
       {board && (
         <DndContext
           onDragEnd={handleDragToken}
-          collisionDetection={closestCorners}
+          collisionDetection={pointerWithin}
         >
-          {/*<h1>{_.get(campaign, 'title')}</h1>*/}
           <div
             style={{
               transform: `scale(${props.scale})`,
@@ -134,22 +115,17 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
                       <GameBoardCell
-                        onClick={() =>
-                          handleCellClick([colIndex, rowIndex], token || null)
-                        }
+                        onMouseDown={() => setMovingToken(token ?? null)}
+                        isMovingToken={!_.isNil(movingToken)}
                         droppableId={`${colIndex},${rowIndex}`}
                       >
                         {token && (
                           // TODO: Change TokenContextMenu into CellContextMenu and dynamically render options based on token occupancy
-                          <TokenContextMenu
-                            nullifySelection={() => setMovingToken(null)}
+                          <ActiveGameToken
                             token={token}
-                          >
-                            <ActiveGameToken
-                              token={token}
-                              selected={movingToken?.id === token.id}
-                            />
-                          </TokenContextMenu>
+                            selected={movingToken?.id === token.id}
+                            nullifySelection={() => setMovingToken(null)}
+                          />
                         )}
                       </GameBoardCell>
                     </div>
