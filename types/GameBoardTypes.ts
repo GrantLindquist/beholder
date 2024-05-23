@@ -1,5 +1,3 @@
-import { UserSession } from '@/types/UserTypes';
-
 export interface GameBoardBase {
   id: string;
   title: string;
@@ -25,17 +23,4 @@ export interface ActiveGameBoardToken extends GameBoardToken {
   boardPosition: [number, number];
   lastMovedAt: number | null;
   monsterNumber?: number;
-}
-
-export interface CampaignPreview {
-  id: string;
-  title: string;
-  description?: string;
-}
-
-export interface CampaignType extends CampaignPreview {
-  boardIds: string[];
-  dmId: string;
-  playerIds: string[];
-  activePlayers?: UserSession[];
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { CampaignType } from '@/types/GameBoardTypes';
+import { CampaignType } from '@/types/CampaignTypes';
 import { doc, getDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 

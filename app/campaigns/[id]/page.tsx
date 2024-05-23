@@ -83,9 +83,9 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   };
 
   return (
-    <>
+    <div className="w-screen h-screen flex flex-row">
       {campaign ? (
-        <div className="w-screen h-screen flex flex-row">
+        <>
           <SideNavbar />
           <div className="w-full h-full flex items-center justify-center">
             {focusedBoard?.id ? (
@@ -116,11 +116,13 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
               </>
             )}
           </div>
-        </div>
+        </>
       ) : (
-        <p>This campaign does not exist.</p>
+        <div className="w-full h-full flex justify-center items-center">
+          <p>This campaign does not exist.</p>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 export default CampaignPage;

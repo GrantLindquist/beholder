@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { createCampaignSchema } from '@/types/FormSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { generateUUID } from '@/utils/uuid';
-import { CampaignType } from '@/types/GameBoardTypes';
+import { CampaignType } from '@/types/CampaignTypes';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 

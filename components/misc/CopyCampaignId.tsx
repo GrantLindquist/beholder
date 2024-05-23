@@ -19,7 +19,7 @@ const CopyCampaignId = () => {
   return (
     <>
       <div className="flex items-center space-x-1 my-1">
-        <label className="text-xs">Campaign Id</label>
+        <label>Campaign Id</label>
         <InfoTooltip
           description={`A player may enter this ID into the "Join Campaign" dialog to join this campaign.`}
         />
