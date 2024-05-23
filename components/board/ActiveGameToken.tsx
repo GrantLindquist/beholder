@@ -27,10 +27,6 @@ const ActiveGameToken = (props: {
 
   const { focusedBoard } = useFocusedBoard();
 
-  const getSelectedClass = () => {
-    return props.selected ? 'ring-4' : '';
-  };
-
   const handleRemoveToken = async (event: any) => {
     event.stopPropagation();
     props.nullifySelection();
@@ -47,7 +43,7 @@ const ActiveGameToken = (props: {
       <ContextMenuTrigger>
         <div
           ref={setNodeRef}
-          className={`cursor-move ${getSelectedClass()}`}
+          className={`cursor-move ${props.selected && 'ring-4'}`}
           {...listeners}
           {...attributes}
         >

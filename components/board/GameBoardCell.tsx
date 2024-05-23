@@ -18,16 +18,12 @@ export const GameBoardCell = ({
     id: droppableId,
   });
 
-  const getHoverClass = () => {
-    return isMovingToken ? 'hover:bg-white hover:bg-opacity-20' : '';
-  };
-
-  // TODO: Make sure that cells cannot constrict
+  // TODO: Make sure that cells cannot constrict size
   return (
     <div
       onMouseDown={onMouseDown}
       ref={setNodeRef}
-      className={`size-12 border border-white border-opacity-20 ${getHoverClass()}`}
+      className={`size-12 border border-white border-opacity-20 ${isMovingToken && 'hover:bg-white hover:bg-opacity-20'}`}
     >
       {children}
     </div>

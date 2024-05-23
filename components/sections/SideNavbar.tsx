@@ -1,6 +1,13 @@
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { DoorOpen, Pencil, Settings, SmilePlus, Table } from 'lucide-react';
+import {
+  DoorOpen,
+  EyeOff,
+  Pencil,
+  Settings,
+  SmilePlus,
+  Table,
+} from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import ActivePlayerList from '@/components/sections/ActivePlayerList';
 import {
@@ -28,11 +35,14 @@ import GameBoardList from '@/components/sections/GameBoardList';
 import SettingsMenu from '@/components/sections/SettingsMenu';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
+import { useSettings } from '@/hooks/useSettings';
+import EditFogOfWar from '@/components/misc/EditFogOfWar';
 
 // TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
   const { isUserDm } = useCampaign();
   const { focusedBoard } = useFocusedBoard();
+  const { settings } = useSettings();
 
   return (
     <div className="fixed top-0 left-0 h-screen w-20 flex flex-col items-center bg-gray-900 z-10 p-2">
@@ -80,6 +90,14 @@ const SideNavbar = () => {
           <DropdownMenuLabel>Settings</DropdownMenuLabel>
           <SettingsMenu />
         </SideNavbarButton>
+        {settings?.fogOfWarEnabled && isUserDm && (
+          <>
+            <Separator className="my-2 bg-gray-700" />
+            <SideNavbarButton title={'Edit Fog of War'} icon={<EyeOff />}>
+              <EditFogOfWar />
+            </SideNavbarButton>
+          </>
+        )}
       </div>
       <div className="mb-4">
         <ActivePlayerList />
@@ -115,7 +133,7 @@ const SideNavbarButton = ({
             </Tooltip>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="max-w-72" side="right">
+          <DropdownMenuContent className="max-w-72 ml-3" side="right">
             <div className="mx-4 my-2">{children}</div>
           </DropdownMenuContent>
         </DropdownMenu>

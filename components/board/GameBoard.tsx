@@ -10,16 +10,17 @@ import {
 } from '@firebase/firestore';
 import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
-import { useCampaign } from '@/hooks/useCampaign';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
 import ActiveGameToken from '@/components/board/ActiveGameToken';
 import _ from 'lodash';
+import { useSettings } from '@/hooks/useSettings';
+import FogOfWar from '@/components/board/FogOfWar';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
-  const { campaign } = useCampaign();
+  const { settings } = useSettings();
   const [board, setBoard] = useState<GameBoardType>();
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
@@ -50,6 +51,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     }
   }, [board?.width]);
 
+  // TODO: Handle token permissions. Players may move their tokens while DMs can move any token
   const moveToken = async (coords: [number, number]) => {
     const docRef = doc(db, 'gameBoards', props.boardId);
     const movingTokenRef = _.cloneDeep(movingToken);
@@ -67,12 +69,17 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     });
   };
 
+  // TODO: Figure out how to prevent handleDragToken from triggering "too many re-renders" warning
   const handleDragToken = async (event: any) => {
     const { over } = event;
-    const coords: [number, number] = over.id
-      .split(',')
-      .map((coord: string) => parseInt(coord, 10));
-    await moveToken(coords);
+    if (over) {
+      const coords: [number, number] = over.id
+        .split(',')
+        .map((coord: string) => parseInt(coord, 10));
+      await moveToken(coords);
+    } else {
+      setMovingToken(null);
+    }
   };
 
   // TODO: Make bg stretch to always perfectly fit cell grid
@@ -104,6 +111,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
               />
               // </AspectRatio>
             )}
+            {settings?.fogOfWarEnabled && <FogOfWar />}
             <div id="game-board" className="absolute">
               {Array.from({ length: board.height }, (__, rowIndex) =>
                 Array.from({ length: board.width }, (__, colIndex) => {

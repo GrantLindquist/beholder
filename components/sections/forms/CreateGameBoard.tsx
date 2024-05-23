@@ -207,7 +207,7 @@ const CreateGameBoard = () => {
           </Button>
         </div>
         {!bgRatio && bgPreview && (
-          <Alert variant="destructive">
+          <Alert variant="warning">
             <ExclamationTriangleIcon className="h-4 w-4" />
             <AlertDescription>
               The board width-height ratio is preset based on your selected

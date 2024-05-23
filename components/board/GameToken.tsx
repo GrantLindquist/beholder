@@ -4,6 +4,7 @@ import DEFAULT_AVATAR from '@/public/assets/defualt_token.jpg';
 import { CELL_SIZE } from '@/app/globals';
 
 // TODO: Image caching?
+// TODO: Organize token z-index by lastMovedAt
 const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
   const getSelectedClass = () => {
     return props.selected ? 'ring-4' : '';
