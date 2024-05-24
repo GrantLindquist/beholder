@@ -18,9 +18,14 @@ import ActiveGameToken from '@/components/board/ActiveGameToken';
 import _ from 'lodash';
 import { useSettings } from '@/hooks/useSettings';
 import FogOfWar from '@/components/board/FogOfWar';
+import { useCampaign } from '@/hooks/useCampaign';
+import { useUser } from '@/hooks/useUser';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const { settings } = useSettings();
+  const { isUserDm } = useCampaign();
+  const { user } = useUser();
+
   const [board, setBoard] = useState<GameBoardType>();
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
@@ -72,7 +77,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   // TODO: Figure out how to prevent handleDragToken from triggering "too many re-renders" warning
   const handleDragToken = async (event: any) => {
     const { over } = event;
-    if (over) {
+    if (over && movingToken) {
       const coords: [number, number] = over.id
         .split(',')
         .map((coord: string) => parseInt(coord, 10));
@@ -97,11 +102,11 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
             style={{
               transform: `scale(${props.scale})`,
             }}
-            className="w-dvw h-full relative flex items-center justify-center"
+            className="w-dvw h-full relative flex items-center justify-center border-2 border-red-400"
           >
             {board?.backgroundImgURL && (
               // TODO: Fix AspectRatio - currently hides child image
-              // <AspectRatio ratio={board.width / board.height}>
+
               <Image
                 src={board.backgroundImgURL}
                 width={CELL_SIZE * board.width}
@@ -109,22 +114,26 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                 alt={`${board.title}'s Background Image`}
                 className="absolute"
               />
-              // </AspectRatio>
             )}
             {settings?.fogOfWarEnabled && <FogOfWar />}
             <div id="game-board" className="absolute">
               {Array.from({ length: board.height }, (__, rowIndex) =>
                 Array.from({ length: board.width }, (__, colIndex) => {
+                  // TODO: This seems problematic for tokens stacked upon each other
                   const token = board.activeTokens.find(
                     (token) =>
                       token.boardPosition[0] === colIndex &&
                       token.boardPosition[1] === rowIndex
                   );
+                  const movable = isUserDm || token?.ownerId === user?.uid;
+                  // TODO: See if mouseDown logic can be placed onto Token. Seems like it'd make more sense
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
                       <GameBoardCell
                         onMouseDown={(event: any) => {
-                          event?.button === 0 && setMovingToken(token ?? null);
+                          if (event?.button === 0 && movable) {
+                            setMovingToken(token ?? null);
+                          }
                         }}
                         isMovingToken={!_.isNil(movingToken)}
                         droppableId={`${colIndex},${rowIndex}`}
@@ -134,6 +143,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                             token={token}
                             selected={movingToken?.id === token.id}
                             nullifySelection={() => setMovingToken(null)}
+                            movable={movable}
                           />
                         )}
                       </GameBoardCell>

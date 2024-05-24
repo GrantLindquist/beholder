@@ -6,13 +6,9 @@ import { CELL_SIZE } from '@/app/globals';
 // TODO: Image caching?
 // TODO: Organize token z-index by lastMovedAt
 const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
-  const getSelectedClass = () => {
-    return props.selected ? 'ring-4' : '';
-  };
-
   return (
     <div className="max-w-12">
-      <div className={getSelectedClass()}>
+      <div className={props.selected ? 'ring-4' : ''}>
         <Image
           src={props.token.tokenImgURL || DEFAULT_AVATAR}
           alt={props.token.title}
