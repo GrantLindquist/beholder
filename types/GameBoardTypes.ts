@@ -21,6 +21,6 @@ export interface GameBoardToken {
 
 export interface ActiveGameBoardToken extends GameBoardToken {
   boardPosition: [number, number];
-  lastMovedAt: number | null;
+  lastMovedAt: number;
   monsterNumber?: number;
 }

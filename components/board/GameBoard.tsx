@@ -56,7 +56,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     }
   }, [board?.width]);
 
-  // TODO: Handle token permissions. Players may move their tokens while DMs can move any token
   const moveToken = async (coords: [number, number]) => {
     const docRef = doc(db, 'gameBoards', props.boardId);
     const movingTokenRef = _.cloneDeep(movingToken);
@@ -70,6 +69,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
       activeTokens: arrayUnion({
         ...movingTokenRef,
         boardPosition: coords,
+        lastMovedAt: Date.now(),
       }),
     });
   };
@@ -81,7 +81,12 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
       const coords: [number, number] = over.id
         .split(',')
         .map((coord: string) => parseInt(coord, 10));
-      await moveToken(coords);
+      if (
+        coords[0] !== movingToken.boardPosition[0] ||
+        coords[1] !== movingToken.boardPosition[1]
+      ) {
+        await moveToken(coords);
+      }
     } else {
       setMovingToken(null);
     }
@@ -89,7 +94,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
 
   // TODO: Make bg stretch to always perfectly fit cell grid
   // TODO: Image caching?
-  // TODO: Investigate glitch where token duplicates upon moving a lot via click
   return (
     // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>
@@ -105,8 +109,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
             className="w-dvw h-full relative flex items-center justify-center border-2 border-red-400"
           >
             {board?.backgroundImgURL && (
-              // TODO: Fix AspectRatio - currently hides child image
-
               <Image
                 src={board.backgroundImgURL}
                 width={CELL_SIZE * board.width}
@@ -119,27 +121,41 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
             <div id="game-board" className="absolute">
               {Array.from({ length: board.height }, (__, rowIndex) =>
                 Array.from({ length: board.width }, (__, colIndex) => {
-                  // TODO: This seems problematic for tokens stacked upon each other
-                  const token = board.activeTokens.find(
-                    (token) =>
-                      token.boardPosition[0] === colIndex &&
-                      token.boardPosition[1] === rowIndex
+                  const token = board.activeTokens.reduce(
+                    (
+                      highestToken: ActiveGameBoardToken | null,
+                      currentToken: ActiveGameBoardToken
+                    ): ActiveGameBoardToken | null => {
+                      if (
+                        currentToken.boardPosition[0] === colIndex &&
+                        currentToken.boardPosition[1] === rowIndex &&
+                        (!highestToken ||
+                          currentToken.lastMovedAt > highestToken.lastMovedAt)
+                      ) {
+                        return currentToken;
+                      }
+                      return highestToken;
+                    },
+                    null
                   );
                   const movable = isUserDm || token?.ownerId === user?.uid;
                   // TODO: See if mouseDown logic can be placed onto Token. Seems like it'd make more sense
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
                       <GameBoardCell
-                        onMouseDown={(event: any) => {
-                          if (event?.button === 0 && movable) {
-                            setMovingToken(token ?? null);
-                          }
-                        }}
                         isMovingToken={!_.isNil(movingToken)}
                         droppableId={`${colIndex},${rowIndex}`}
                       >
                         {token && (
                           <ActiveGameToken
+                            onMouseDown={(event: any) => {
+                              if (event?.button === 0 && movable) {
+                                setMovingToken(token);
+                              }
+                            }}
+                            onMouseUp={() => {
+                              setMovingToken(null);
+                            }}
                             token={token}
                             selected={movingToken?.id === token.id}
                             nullifySelection={() => setMovingToken(null)}
