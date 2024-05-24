@@ -62,6 +62,7 @@ const CreateToken = () => {
       tokenImgURL: tokenImgURL,
       ownerId: user.uid,
       isMonster: values.isMonster,
+      lastPlacedAt: Date.now(),
     };
 
     const docRef = doc(db, 'tokens', newToken.id);

@@ -17,6 +17,7 @@ export interface GameBoardToken {
   ownerId: string;
   tokenImgURL: string | null;
   isMonster?: boolean;
+  lastPlacedAt?: number;
 }
 
 export interface ActiveGameBoardToken extends GameBoardToken {

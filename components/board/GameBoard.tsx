@@ -20,6 +20,7 @@ import { useSettings } from '@/hooks/useSettings';
 import FogOfWar from '@/components/board/FogOfWar';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useUser } from '@/hooks/useUser';
+import CellContextMenu from '@/components/board/CellContextMenu';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const { settings } = useSettings();
@@ -142,27 +143,31 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                   // TODO: See if mouseDown logic can be placed onto Token. Seems like it'd make more sense
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
-                      <GameBoardCell
-                        isMovingToken={!_.isNil(movingToken)}
-                        droppableId={`${colIndex},${rowIndex}`}
+                      <CellContextMenu
+                        token={token}
+                        coords={[colIndex, rowIndex]}
                       >
-                        {token && (
-                          <ActiveGameToken
-                            onMouseDown={(event: any) => {
-                              if (event?.button === 0 && movable) {
-                                setMovingToken(token);
-                              }
-                            }}
-                            onMouseUp={() => {
-                              setMovingToken(null);
-                            }}
-                            token={token}
-                            selected={movingToken?.id === token.id}
-                            nullifySelection={() => setMovingToken(null)}
-                            movable={movable}
-                          />
-                        )}
-                      </GameBoardCell>
+                        <GameBoardCell
+                          isMovingToken={!_.isNil(movingToken)}
+                          droppableId={`${colIndex},${rowIndex}`}
+                        >
+                          {token && (
+                            <ActiveGameToken
+                              onMouseDown={(event: any) => {
+                                if (event?.button === 0 && movable) {
+                                  setMovingToken(token);
+                                }
+                              }}
+                              onMouseUp={() => {
+                                setMovingToken(null);
+                              }}
+                              token={token}
+                              selected={movingToken?.id === token.id}
+                              movable={movable}
+                            />
+                          )}
+                        </GameBoardCell>
+                      </CellContextMenu>
                     </div>
                   );
                 })

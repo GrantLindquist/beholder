@@ -23,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useCampaign } from '@/hooks/useCampaign';
 
-const TokenList = () => {
+const TokenList = (props: { placeCoord?: [number, number] }) => {
   const { user } = useUser();
   const { load } = useLoader();
   const { focusedBoard } = useFocusedBoard();
@@ -48,7 +48,11 @@ const TokenList = () => {
           ownerId: doc.data().ownerId,
           tokenImgURL: doc.data().tokenImgURL,
           isMonster: doc.data().isMonster || false,
+          lastPlacedAt: doc.data().lastPlacedAt || 0,
         }));
+        tokens.sort((a, b) => {
+          return b.lastPlacedAt - a.lastPlacedAt;
+        });
         setTokens(tokens);
       });
 
@@ -92,13 +96,17 @@ const TokenList = () => {
       await updateDoc(docRef, {
         activeTokens: arrayUnion({
           ...selectedToken,
-          boardPosition: [0, 0],
+          boardPosition: props.placeCoord ?? [0, 0],
           lastMovedAt: Date.now(),
           ...(selectedToken.isMonster && {
             id: `${selectedToken.id}-${monsterNumber}`,
             monsterNumber: monsterNumber,
           }),
         }),
+      });
+      await updateDoc(doc(db, 'tokens', selectedToken.id), {
+        ...selectedToken,
+        lastPlacedAt: Date.now(),
       });
     }
   };
