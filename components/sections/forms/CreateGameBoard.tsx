@@ -23,6 +23,7 @@ import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 import db, { storage } from '@/app/firebase';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
+import { Link } from 'lucide-react';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
@@ -198,12 +199,12 @@ const CreateGameBoard = () => {
             )}
           />
           <Button
-            size="icon"
-            variant={bgRatio ? 'outline' : 'ghost'}
+            variant="ghost"
             type="button"
             onClick={handleToggleBgRatio}
+            className={`size-9 ${bgRatio ? 'bg-gray-800' : ''}`}
           >
-            Link
+            <Link size={16} />
           </Button>
         </div>
         {!bgRatio && bgPreview && (
