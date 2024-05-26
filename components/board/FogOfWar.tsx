@@ -10,7 +10,6 @@ const FogOfWar = () => {
 
   useEffect(() => {
     const fogOfWar = document.querySelector('#fog-of-war');
-    console.log(fogOfWar);
     if (fogOfWar && focusedBoard) {
       // @ts-ignore
       fogOfWar.style.gridTemplateColumns = `repeat(${focusedBoard.width}, minmax(0, 1fr))`;

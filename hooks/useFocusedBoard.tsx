@@ -7,16 +7,18 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { GameBoardType } from '@/types/GameBoardTypes';
-import { doc, onSnapshot } from '@firebase/firestore';
+import { GameBoardType, SettingsEnum } from '@/types/GameBoardTypes';
+import { doc, onSnapshot, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 
 const FocusedBoardContext = createContext<{
   focusedBoard: GameBoardType | null;
   setFocusedBoardId: any;
+  toggleSetting: (key: SettingsEnum, toggle: boolean) => void;
 }>({
   focusedBoard: null,
   setFocusedBoardId: () => {},
+  toggleSetting: () => {},
 });
 
 export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
@@ -40,8 +42,22 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [focusedBoardId]);
 
+  const toggleSetting = async (key: SettingsEnum, toggle: boolean) => {
+    if (focusedBoard) {
+      await updateDoc(doc(db, 'gameBoards', focusedBoard.id), {
+        ...focusedBoard,
+        settings: {
+          ...focusedBoard.settings,
+          [key]: toggle,
+        },
+      });
+    }
+  };
+
   return (
-    <FocusedBoardContext.Provider value={{ focusedBoard, setFocusedBoardId }}>
+    <FocusedBoardContext.Provider
+      value={{ focusedBoard, setFocusedBoardId, toggleSetting }}
+    >
       {children}
     </FocusedBoardContext.Provider>
   );

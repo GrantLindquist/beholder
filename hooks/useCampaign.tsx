@@ -11,8 +11,7 @@ const CampaignContext = createContext<{
   isUserDm: boolean | null;
 }>({
   campaign: null,
-  enterCampaign: (_campaign: string, _userId: string) =>
-    console.error('Failed to initialize enterCampaign'),
+  enterCampaign: () => {},
   isUserDm: null,
 });
 
@@ -24,6 +23,7 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
     const campaignDocRef = doc(db, 'campaigns', campaignId);
     const campaignDocSnap = await getDoc(campaignDocRef);
 
+    // TODO: Use toasts here
     if (
       campaignDocSnap.exists() &&
       campaignDocSnap.data().playerIds.includes(userId)
@@ -40,7 +40,7 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
         : setIsUserDm(false);
     } else {
       console.error(
-        'Encountered issue while trying to load campaign of id: ' + campaignId
+        `Encountered issue while trying to load campaign of id ` + campaignId
       );
     }
   };

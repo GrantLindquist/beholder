@@ -7,6 +7,7 @@ export interface GameBoardType extends GameBoardBase {
   height: number;
   backgroundImgURL: string | null;
   activeTokens: ActiveGameBoardToken[];
+  settings: GameBoardSettings;
 }
 
 export interface GameBoardToken {
@@ -24,4 +25,12 @@ export interface ActiveGameBoardToken extends GameBoardToken {
   boardPosition: [number, number];
   lastMovedAt: number;
   monsterNumber?: number;
+}
+
+export interface GameBoardSettings {
+  fowEnabled: boolean;
+}
+
+export enum SettingsEnum {
+  FowEnabled = 'fowEnabled',
 }

@@ -8,7 +8,6 @@ import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
 import { UserProvider } from '@/hooks/useUser';
 import { LoadingProvider } from '@/hooks/useLoader';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { SettingsProvider } from '@/hooks/useSettings';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,9 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <TooltipProvider delayDuration={500}>
               <UserProvider>
                 <CampaignProvider>
-                  <SettingsProvider>
-                    <FocusedBoardProvider>{children}</FocusedBoardProvider>
-                  </SettingsProvider>
+                  <FocusedBoardProvider>{children}</FocusedBoardProvider>
                 </CampaignProvider>
               </UserProvider>
             </TooltipProvider>

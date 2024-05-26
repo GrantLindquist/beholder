@@ -102,7 +102,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                   defaultValue={[1]}
                   min={0.3}
                   max={3}
-                  step={0.01}
+                  step={0.1}
                   onValueChange={handleMagnify}
                 />
 

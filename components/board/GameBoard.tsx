@@ -16,14 +16,14 @@ import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
 import ActiveGameToken from '@/components/board/ActiveGameToken';
 import _ from 'lodash';
-import { useSettings } from '@/hooks/useSettings';
 import FogOfWar from '@/components/board/FogOfWar';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useUser } from '@/hooks/useUser';
 import CellContextMenu from '@/components/board/CellContextMenu';
+import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
-  const { settings } = useSettings();
+  const { focusedBoard } = useFocusedBoard();
   const { isUserDm } = useCampaign();
   const { user } = useUser();
 
@@ -118,7 +118,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                 className="absolute"
               />
             )}
-            {settings?.fogOfWarEnabled && <FogOfWar />}
+            {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
             <div id="game-board" className="absolute">
               {Array.from({ length: board.height }, (__, rowIndex) =>
                 Array.from({ length: board.width }, (__, colIndex) => {

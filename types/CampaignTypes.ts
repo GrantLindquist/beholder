@@ -12,11 +12,3 @@ export interface CampaignType extends CampaignPreview {
   playerIds: string[];
   activePlayers?: UserSession[];
 }
-
-export interface CampaignSettings {
-  fogOfWarEnabled: boolean;
-}
-
-export enum SettingsEnum {
-  FogOfWarEnabled = 'fogOfWarEnabled',
-}
