@@ -62,6 +62,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     const movingTokenRef = _.cloneDeep(movingToken);
     setMovingToken(null);
 
+    // TODO: Is removing entire token instead of updating nested value really the best option here?
     await updateDoc(docRef, {
       activeTokens: arrayRemove(movingTokenRef),
     });
@@ -146,6 +147,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                       <CellContextMenu
                         token={token}
                         coords={[colIndex, rowIndex]}
+                        disabled={!_.isNil(token) && !movable}
                       >
                         <GameBoardCell
                           isMovingToken={!_.isNil(movingToken)}

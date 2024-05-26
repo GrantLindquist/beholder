@@ -63,6 +63,9 @@ const CreateGameBoard = () => {
       height: values.height,
       activeTokens: [],
       backgroundImgURL: backgroundImgURL,
+      settings: {
+        fowEnabled: false,
+      },
     };
 
     if (campaign) {

@@ -70,7 +70,7 @@ const ActivePlayerList = () => {
   return (
     <div className="flex flex-col items-center mb-4">
       {_.map(activePlayers, (player) => (
-        <Tooltip>
+        <Tooltip key={player.uid}>
           <TooltipTrigger asChild>
             <Image
               height={40}

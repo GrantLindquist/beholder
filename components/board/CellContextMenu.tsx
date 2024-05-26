@@ -19,14 +19,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import TokenList from '@/components/sections/TokenList';
+import ConditionList from '@/components/board/ConditionList';
 
 type CellContextMenuProps = {
   token: ActiveGameBoardToken | null;
   coords: [number, number];
+  disabled?: boolean;
   children: ReactNode;
 };
 
-const CellContextMenu = ({ token, coords, children }: CellContextMenuProps) => {
+const CellContextMenu = ({
+  token,
+  coords,
+  disabled,
+  children,
+}: CellContextMenuProps) => {
   const { focusedBoard } = useFocusedBoard();
 
   const handleRemoveToken = async (event: any) => {
@@ -45,17 +52,30 @@ const CellContextMenu = ({ token, coords, children }: CellContextMenuProps) => {
       {token ? (
         <ContextMenuContent>
           <ContextMenuLabel>{token.title}</ContextMenuLabel>
-          <ContextMenuSeparator />
-          <ContextMenuItem>Add Condition</ContextMenuItem>
-          <ContextMenuItem>Kill</ContextMenuItem>
-          <ContextMenuItem onClick={handleRemoveToken}>Remove</ContextMenuItem>
+          {!disabled && (
+            <>
+              <ContextMenuSeparator />
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <ContextMenuItem>Conditions</ContextMenuItem>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="max-w-72 ml-3">
+                  <ConditionList token={token} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ContextMenuItem>Kill</ContextMenuItem>
+              <ContextMenuItem onClick={handleRemoveToken}>
+                Remove
+              </ContextMenuItem>
+            </>
+          )}
         </ContextMenuContent>
       ) : (
         <ContextMenuContent>
+          <ContextMenuLabel>{`(x:${coords[0]}, y:${coords[1]})`}</ContextMenuLabel>
+          <ContextMenuSeparator />
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <ContextMenuLabel>{`(x:${coords[0]}, y:${coords[1]})`}</ContextMenuLabel>
-              <ContextMenuSeparator />
               <ContextMenuItem>Place Token</ContextMenuItem>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="max-w-72 ml-3">

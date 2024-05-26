@@ -25,6 +25,7 @@ export interface ActiveGameBoardToken extends GameBoardToken {
   boardPosition: [number, number];
   lastMovedAt: number;
   monsterNumber?: number;
+  conditions: string[];
 }
 
 export interface GameBoardSettings {

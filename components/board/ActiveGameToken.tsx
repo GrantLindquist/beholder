@@ -3,6 +3,8 @@ import Image from 'next/image';
 import DEFAULT_AVATAR from '@/public/assets/defualt_token.jpg';
 import { useDraggable } from '@dnd-kit/core';
 import { CELL_SIZE } from '@/app/globals';
+import _ from 'lodash';
+import ConditionsBadge from '@/components/board/ConditionsBadge';
 
 // TODO: Image caching?
 const ActiveGameToken = (props: {
@@ -20,12 +22,16 @@ const ActiveGameToken = (props: {
     <>
       <div
         ref={setNodeRef}
-        className={`${props.movable ? 'cursor-move' : ''} ${props.selected ? 'ring-4' : ''}`}
+        className={`relative ${props.movable ? 'cursor-move' : ''} ${props.selected ? 'ring-4' : ''}`}
         onMouseDown={props.onMouseDown}
         onMouseUp={props.onMouseUp}
         {...listeners}
         {...attributes}
       >
+        {_.size(props.token.conditions) > 0 && (
+          <ConditionsBadge conditions={props.token.conditions} />
+        )}
+
         <Image
           src={props.token.tokenImgURL || DEFAULT_AVATAR}
           alt={props.token.title}
