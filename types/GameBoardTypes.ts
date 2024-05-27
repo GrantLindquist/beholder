@@ -8,6 +8,7 @@ export interface GameBoardType extends GameBoardBase {
   backgroundImgURL: string | null;
   activeTokens: ActiveGameBoardToken[];
   settings: GameBoardSettings;
+  fowCells: string[];
 }
 
 export interface GameBoardToken {

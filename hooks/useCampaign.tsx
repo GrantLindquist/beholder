@@ -15,6 +15,7 @@ const CampaignContext = createContext<{
   isUserDm: null,
 });
 
+// TODO: Setup a live listener here and remove listeners from non-hooks
 export const CampaignProvider = ({ children }: { children: ReactNode }) => {
   const [campaign, setCampaign] = useState<CampaignType | null>(null);
   const [isUserDm, setIsUserDm] = useState<boolean | null>(null);

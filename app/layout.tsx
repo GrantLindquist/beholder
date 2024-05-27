@@ -8,6 +8,7 @@ import { FocusedBoardProvider } from '@/hooks/useFocusedBoard';
 import { UserProvider } from '@/hooks/useUser';
 import { LoadingProvider } from '@/hooks/useLoader';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { FowProvider } from '@/hooks/useFow';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
   description: 'D&D fun time',
 };
 
+// TODO: Consolidate providers into grouped wrappers?
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -29,7 +31,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <TooltipProvider delayDuration={500}>
               <UserProvider>
                 <CampaignProvider>
-                  <FocusedBoardProvider>{children}</FocusedBoardProvider>
+                  <FocusedBoardProvider>
+                    <FowProvider>{children}</FowProvider>
+                  </FocusedBoardProvider>
                 </CampaignProvider>
               </UserProvider>
             </TooltipProvider>

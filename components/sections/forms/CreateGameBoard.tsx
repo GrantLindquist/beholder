@@ -24,6 +24,7 @@ import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 import db, { storage } from '@/app/firebase';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import { Link } from 'lucide-react';
+import { getDefaultFowMatrix } from '@/utils/fow';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
@@ -63,6 +64,7 @@ const CreateGameBoard = () => {
       height: values.height,
       activeTokens: [],
       backgroundImgURL: backgroundImgURL,
+      fowCells: getDefaultFowMatrix(values.width, values.height),
       settings: {
         fowEnabled: false,
       },

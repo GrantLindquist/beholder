@@ -21,7 +21,6 @@ export const GameBoardCell = ({
     <div
       ref={setNodeRef}
       className={`size-12 border border-white border-opacity-20 ${isMovingToken && 'hover:bg-white hover:bg-opacity-20'}`}
-      onClick={() => console.log(children)}
     >
       {children}
     </div>

@@ -25,6 +25,7 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
   const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
   const [focusedBoardId, setFocusedBoardId] = useState<string | null>(null);
 
+  // TODO: Add live updates for board switching, prob a focusedBoardId campaign attribute?
   useEffect(() => {
     if (focusedBoardId) {
       const boardDocRef = doc(db, 'gameBoards', focusedBoardId);
