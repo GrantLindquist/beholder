@@ -70,6 +70,10 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      cursor: {
+        erase: 'url(/assets/eraser_cursor.png), pointer',
+        draw: 'url(/assets/paint_cursor.png), pointer',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

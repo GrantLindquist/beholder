@@ -1,6 +1,6 @@
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
 import Image from 'next/image';
-import DEFAULT_AVATAR from '@/public/assets/defualt_token.jpg';
+import DEFAULT_AVATAR from '@/public/assets/default_token.jpg';
 import { useDraggable } from '@dnd-kit/core';
 import { CELL_SIZE } from '@/app/globals';
 import _ from 'lodash';

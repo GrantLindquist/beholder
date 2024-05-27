@@ -46,7 +46,7 @@ const FogOfWar = () => {
               return (
                 <div
                   key={`fow-${colIndex},${rowIndex}`}
-                  className={`size-12 ${focusedBoard.fowCells?.includes(`${colIndex},${rowIndex}`) ? 'bg-black' : ''}  z-50 ${_.isNull(eraseFow) ? 'pointer-events-none' : ''} ${isUserDm ? 'bg-opacity-70' : 'border-2 border-black'} ${eraseFow ? 'cursor-move' : ''} ${eraseFow === false ? 'cursor-col-resize' : ''}`}
+                  className={`size-12 ${focusedBoard.fowCells?.includes(`${colIndex},${rowIndex}`) ? 'bg-black' : ''}  z-50 ${_.isNull(eraseFow) ? 'pointer-events-none' : ''} ${isUserDm ? 'bg-opacity-70' : 'border-2 border-black'} ${eraseFow ? 'cursor-erase' : ''} ${eraseFow === false ? 'cursor-draw' : ''}`}
                   onMouseOver={() =>
                     !_.isNull(eraseFow) &&
                     mouseDown &&
