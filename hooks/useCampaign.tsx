@@ -1,53 +1,68 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { CampaignType } from '@/types/CampaignTypes';
-import { doc, getDoc } from '@firebase/firestore';
+import { doc, onSnapshot } from '@firebase/firestore';
 import db from '@/app/firebase';
+import { useToast } from '@/components/ui/use-toast';
+import { useUser } from '@/hooks/useUser';
 
 const CampaignContext = createContext<{
   campaign: CampaignType | null;
-  enterCampaign: (campaign: string, userId: string) => void;
+  setCampaignId: Dispatch<SetStateAction<string | null>>;
   isUserDm: boolean | null;
 }>({
   campaign: null,
-  enterCampaign: () => {},
+  setCampaignId: () => {},
   isUserDm: null,
 });
 
-// TODO: Setup a live listener here and remove listeners from non-hooks
 export const CampaignProvider = ({ children }: { children: ReactNode }) => {
+  const { toast } = useToast();
+  const { user } = useUser();
+
   const [campaign, setCampaign] = useState<CampaignType | null>(null);
+  const [campaignId, setCampaignId] = useState<string | null>(null);
+
   const [isUserDm, setIsUserDm] = useState<boolean | null>(null);
 
-  const enterCampaign = async (campaignId: string, userId: string) => {
-    const campaignDocRef = doc(db, 'campaigns', campaignId);
-    const campaignDocSnap = await getDoc(campaignDocRef);
-
-    // TODO: Use toasts here
-    if (
-      campaignDocSnap.exists() &&
-      campaignDocSnap.data().playerIds.includes(userId)
-    ) {
-      setCampaign({
-        id: campaignDocSnap.id,
-        title: campaignDocSnap.data().title,
-        boardIds: campaignDocSnap.data().boardIds,
-        dmId: campaignDocSnap.data().dmId,
-        playerIds: campaignDocSnap.data().playerIds,
-      });
-      userId === campaignDocSnap.data().dmId
-        ? setIsUserDm(true)
-        : setIsUserDm(false);
-    } else {
-      console.error(
-        `Encountered issue while trying to load campaign of id ` + campaignId
-      );
+  useEffect(() => {
+    if (campaignId && user) {
+      try {
+        const unsubscribe = onSnapshot(
+          doc(db, 'campaigns', campaignId),
+          (docSnap) => {
+            if (docSnap.exists()) {
+              setCampaign(docSnap.data() as CampaignType);
+              setIsUserDm(docSnap.data().dmId === user.uid);
+            } else {
+              console.error('The queried campaign does not exist.');
+            }
+          }
+        );
+        // Cleanup
+        return () => {
+          unsubscribe();
+        };
+      } catch (e: any) {
+        toast({
+          title: 'Critical Fail',
+          description: e.message,
+        });
+      }
     }
-  };
+  }, [campaignId]);
 
   return (
-    <CampaignContext.Provider value={{ campaign, enterCampaign, isUserDm }}>
+    <CampaignContext.Provider value={{ campaign, setCampaignId, isUserDm }}>
       {children}
     </CampaignContext.Provider>
   );

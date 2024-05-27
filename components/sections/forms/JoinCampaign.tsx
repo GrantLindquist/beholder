@@ -40,33 +40,34 @@ const JoinCampaign = () => {
     }
   };
 
-  // TODO: The tooltip blocks the submit action (?)
   return (
-    <form
-      onSubmit={(event) =>
-        load(
-          handleJoinCampaign(event),
-          'An error occurred while joining that campaign.'
-        )
-      }
-      className="m-2"
-    >
-      <div className="flex flex-row items-center space-x-2">
-        <InfoTooltip
-          description={
-            <p>
-              This can be found by going to{' '}
-              <strong>{`Settings > Campaign Id`}</strong> within your desired
-              campaign.
-            </p>
-          }
-        />
-        <Input placeholder="Campaign Id" />
-        <Button type="submit">Submit</Button>
-      </div>
+    <div className="flex flex-row items-center space-x-2 mx-2">
+      <InfoTooltip
+        description={
+          <p>
+            This can be found by going to{' '}
+            <strong>{`Settings > Campaign Id`}</strong> within your desired
+            campaign.
+          </p>
+        }
+      />
+      <form
+        onSubmit={(event) =>
+          load(
+            handleJoinCampaign(event),
+            'An error occurred while joining that campaign.'
+          )
+        }
+        className="m-2"
+      >
+        <div className="flex flex-row items-center space-x-2">
+          <Input placeholder="Campaign Id" />
+          <Button type="submit">Submit</Button>
+        </div>
 
-      <p className="text-xs mt-1 text-red-600">{displayMessage}</p>
-    </form>
+        <p className="text-xs mt-1 text-red-600">{displayMessage}</p>
+      </form>
+    </div>
   );
 };
 export default JoinCampaign;

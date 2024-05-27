@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Loader } from '@/components/misc/Loader';
 
 const LoaderContext = createContext<{
-  load: (promise: Promise<any>, error: string, success?: string) => void;
+  load: (promise: Promise<any>, error: string, displayLoader?: boolean) => void;
 }>({
   load: () => {},
 });
@@ -14,34 +14,30 @@ const LoaderContext = createContext<{
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
-  const [isLoading, setLoading] = useState(false);
+  const [loadingUI, setLoadingUI] = useState(false);
 
   const load = async (
     promise: Promise<any>,
     error: string,
-    success?: string
+    hideLoader?: boolean
   ) => {
-    !isLoading && setLoading(true);
+    !loadingUI && hideLoader && setLoadingUI(true);
     try {
       await promise;
-      setLoading(false);
-      success &&
-        toast({
-          description: success,
-        });
+      setLoadingUI(false);
     } catch (e) {
       console.error('An error occurred:', e);
       toast({
         title: 'Critical Fail',
         description: error,
       });
-      setTimeout(() => setLoading(false), 500);
+      setTimeout(() => setLoadingUI(false), 500);
     }
   };
 
   return (
     <LoaderContext.Provider value={{ load }}>
-      {isLoading && <Loader />}
+      {loadingUI && <Loader />}
       {children}
       <Toaster />
     </LoaderContext.Provider>

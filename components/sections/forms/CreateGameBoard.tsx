@@ -25,9 +25,11 @@ import db, { storage } from '@/app/firebase';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import { Link } from 'lucide-react';
 import { getDefaultFowMatrix } from '@/utils/fow';
+import { useLoader } from '@/hooks/useLoader';
 
 const CreateGameBoard = () => {
   const { campaign } = useCampaign();
+  const { load } = useLoader();
   const [bgPreview, setBgPreview] = useState<string | null>(null);
   const [bgImage, setBgImage] = useState(null);
   // Width divided by height
@@ -112,11 +114,16 @@ const CreateGameBoard = () => {
     }
   };
 
-  // TODO: Remove ts-ignore and fix ts issue
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleCreateBoard)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          load(
+            handleCreateBoard(form.getValues()),
+            'An error occurred while creating your board.'
+          );
+        }}
         className="space-y-4"
       >
         <FormField
@@ -126,7 +133,7 @@ const CreateGameBoard = () => {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,7 +149,6 @@ const CreateGameBoard = () => {
                 {/* @ts-ignore */}
                 <Input
                   type="file"
-                  placeholder="shadcn"
                   accept=".jpg, .jpeg, .png"
                   {...field}
                   onChange={handleUploadFile}
@@ -170,7 +176,6 @@ const CreateGameBoard = () => {
                 <FormControl>
                   <Input
                     type="number"
-                    placeholder="shadcn"
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);
@@ -191,7 +196,6 @@ const CreateGameBoard = () => {
                 <FormControl>
                   <Input
                     type="number"
-                    placeholder="shadcn"
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);

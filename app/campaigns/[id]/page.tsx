@@ -23,7 +23,7 @@ import { DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { load } = useLoader();
   const { user } = useUser();
-  const { campaign, enterCampaign } = useCampaign();
+  const { campaign, setCampaignId } = useCampaign();
   const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
 
   const [boardScale, setBoardScale] = useState(1);
@@ -39,13 +39,13 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     const initializeCampaign = async () => {
-      user?.uid && enterCampaign(params.id, user.uid);
+      setCampaignId(params.id);
     };
     load(
       initializeCampaign(),
       'An error occurred while entering your campaign'
     );
-  }, [params.id, user]);
+  }, [params.id]);
 
   useEffect(() => {
     const fetchDefaultBoardId = async () => {

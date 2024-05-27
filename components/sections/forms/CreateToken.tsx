@@ -23,10 +23,12 @@ import { getDownloadURL, ref, uploadBytes } from '@firebase/storage';
 import { useCampaign } from '@/hooks/useCampaign';
 import { Switch } from '@/components/ui/switch';
 import InfoTooltip from '@/components/misc/InfoTooltip';
+import { useLoader } from '@/hooks/useLoader';
 
 const CreateToken = () => {
   const { user } = useUser();
   const { isUserDm } = useCampaign();
+  const { load } = useLoader();
   const [tokenImage, setTokenImage] = useState(null);
   const [tokenImgPreview, setTokenImgPreview] = useState<string | null>(null);
 
@@ -78,11 +80,16 @@ const CreateToken = () => {
     };
   };
 
-  // TODO: Create a info tooltip component for describing things that aren't inherently obvious
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleCreateToken)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          load(
+            handleCreateToken(form.getValues()),
+            'An error occurred while creating your token.'
+          );
+        }}
         className="space-y-4"
       >
         <FormField
@@ -92,7 +99,7 @@ const CreateToken = () => {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,7 +115,6 @@ const CreateToken = () => {
                 {/* @ts-ignore */}
                 <Input
                   type="file"
-                  placeholder="shadcn"
                   accept=".jpg, .jpeg, .png"
                   {...field}
                   onChange={handleUploadFile}

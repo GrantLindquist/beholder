@@ -20,9 +20,11 @@ import { generateUUID } from '@/utils/uuid';
 import { CampaignType } from '@/types/CampaignTypes';
 import { arrayUnion, doc, setDoc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
+import { useLoader } from '@/hooks/useLoader';
 
 const CreateCampaign = () => {
   const { user } = useUser();
+  const { load } = useLoader();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof createCampaignSchema>>({
@@ -60,11 +62,16 @@ const CreateCampaign = () => {
     }
   };
 
-  // TODO: Go through each form and rename placeholders
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleCreateCampaign)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          load(
+            handleCreateCampaign(form.getValues()),
+            'An error occurred while creating your campaign.'
+          );
+        }}
         className="space-y-4"
       >
         <FormField
@@ -74,7 +81,7 @@ const CreateCampaign = () => {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -87,7 +94,7 @@ const CreateCampaign = () => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
