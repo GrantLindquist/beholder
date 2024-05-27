@@ -5,9 +5,9 @@ import {
 } from '@/components/ui/tooltip';
 import _ from 'lodash';
 
-const ConditionsBadge = (props: { conditions: string[] }) => {
+const ConditionBadge = (props: { conditions: string[] }) => {
   return (
-    <div className="absolute top-0 right-0">
+    <div className="absolute top-0 right-0 z-10">
       <Tooltip>
         <TooltipTrigger>
           <div className="border-2 border-white rounded-full bg-black">
@@ -26,4 +26,4 @@ const ConditionsBadge = (props: { conditions: string[] }) => {
     </div>
   );
 };
-export default ConditionsBadge;
+export default ConditionBadge;

@@ -11,7 +11,7 @@ import {
 import { ReactNode } from 'react';
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
-import { arrayRemove, doc, updateDoc } from '@firebase/firestore';
+import { arrayRemove, arrayUnion, doc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import {
   DropdownMenu,
@@ -46,12 +46,31 @@ const CellContextMenu = ({
     }
   };
 
+  const handleUpdateDeathState = async (event: any, dead: boolean) => {
+    event.stopPropagation();
+    if (focusedBoard) {
+      const boardDocRef = doc(db, 'gameBoards', focusedBoard.id);
+      await updateDoc(boardDocRef, {
+        activeTokens: arrayRemove(token),
+      });
+      await updateDoc(boardDocRef, {
+        activeTokens: arrayUnion({
+          ...token,
+          dead: dead,
+        }),
+      });
+    }
+  };
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
       {token ? (
         <ContextMenuContent>
-          <ContextMenuLabel>{token.title}</ContextMenuLabel>
+          <ContextMenuLabel>
+            {token.title}
+            {token.monsterNumber && ` (${token.monsterNumber})`}
+          </ContextMenuLabel>
           {!disabled && (
             <>
               <ContextMenuSeparator />
@@ -63,7 +82,11 @@ const CellContextMenu = ({
                   <ConditionList token={token} />
                 </DropdownMenuContent>
               </DropdownMenu>
-              <ContextMenuItem>Kill</ContextMenuItem>
+              <ContextMenuItem
+                onClick={(event) => handleUpdateDeathState(event, !token.dead)}
+              >
+                {token.dead ? 'Revive' : 'Kill'}
+              </ContextMenuItem>
               <ContextMenuItem onClick={handleRemoveToken}>
                 Remove
               </ContextMenuItem>

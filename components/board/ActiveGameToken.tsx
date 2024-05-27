@@ -4,7 +4,8 @@ import DEFAULT_AVATAR from '@/public/assets/defualt_token.jpg';
 import { useDraggable } from '@dnd-kit/core';
 import { CELL_SIZE } from '@/app/globals';
 import _ from 'lodash';
-import ConditionsBadge from '@/components/board/ConditionsBadge';
+import ConditionBadge from '@/components/board/ConditionBadge';
+import DeathBadge from '@/components/board/DeathBadge';
 
 // TODO: Image caching?
 const ActiveGameToken = (props: {
@@ -28,16 +29,24 @@ const ActiveGameToken = (props: {
         {...listeners}
         {...attributes}
       >
-        {_.size(props.token.conditions) > 0 && (
-          <ConditionsBadge conditions={props.token.conditions} />
+        {props.token.dead ? (
+          <DeathBadge />
+        ) : (
+          <>
+            {_.size(props.token.conditions) > 0 && (
+              <ConditionBadge conditions={props.token.conditions} />
+            )}
+          </>
         )}
 
-        <Image
-          src={props.token.tokenImgURL || DEFAULT_AVATAR}
-          alt={props.token.title}
-          height={CELL_SIZE}
-          width={CELL_SIZE}
-        />
+        <div className={`${props.token.dead ? 'grayscale' : ''}`}>
+          <Image
+            src={props.token.tokenImgURL || DEFAULT_AVATAR}
+            alt={props.token.title}
+            height={CELL_SIZE}
+            width={CELL_SIZE}
+          />
+        </div>
       </div>
       <div className="bg-gray-300 bg-opacity-70 text-zinc-950 rounded relative w-fit mt-1">
         <p className="text-xs text-center px-1.5">
