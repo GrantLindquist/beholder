@@ -1,30 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  arrayRemove,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from '@firebase/firestore';
+import { arrayRemove, deleteDoc, doc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
-import _ from 'lodash';
 import { useCampaign } from '@/hooks/useCampaign';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
-import { useUser } from '@/hooks/useUser';
-import { useLoader } from '@/hooks/useLoader';
 import { SearchIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
-  const { load } = useLoader();
-  const { user } = useUser();
   const { campaign, setCampaignId } = useCampaign();
-  const { focusedBoard, setFocusedBoardId } = useFocusedBoard();
+  const { focusedBoard } = useFocusedBoard();
 
   const [boardScale, setBoardScale] = useState(1);
 
@@ -38,30 +27,8 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   }, [focusedBoard?.id]);
 
   useEffect(() => {
-    const initializeCampaign = async () => {
-      setCampaignId(params.id);
-    };
-    load(
-      initializeCampaign(),
-      'An error occurred while entering your campaign'
-    );
+    setCampaignId(params.id);
   }, [params.id]);
-
-  useEffect(() => {
-    const fetchDefaultBoardId = async () => {
-      if (campaign) {
-        const campaignDocRef = doc(db, 'campaigns', campaign.id);
-        const campaignDocSnap = await getDoc(campaignDocRef);
-        if (campaignDocSnap.exists()) {
-          setFocusedBoardId(_.get(campaignDocSnap.data(), 'boardIds.0', null));
-        }
-      }
-    };
-    load(
-      fetchDefaultBoardId(),
-      'An error occurred while loading your current game board.'
-    );
-  }, [campaign]);
 
   const handleMagnify = (newValue: number[]) => {
     setBoardScale(newValue[0]);

@@ -11,4 +11,5 @@ export interface CampaignType extends CampaignPreview {
   dmId: string;
   playerIds: string[];
   activePlayers?: UserSession[];
+  focusedBoardId: string | null;
 }

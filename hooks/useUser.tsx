@@ -20,6 +20,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { load } = useLoader();
   const [user, setUser] = useState<UserSession | null>(null);
 
+  // TODO: This useEffect doesn't run when it should. Figure out how to signal it to run
   useEffect(() => {
     const fetchUser = async () => {
       const session = await getUserFromSession();

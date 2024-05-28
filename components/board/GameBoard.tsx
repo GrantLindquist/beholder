@@ -1,13 +1,7 @@
 'use client';
 
-import { ActiveGameBoardToken, GameBoardType } from '@/types/GameBoardTypes';
-import {
-  arrayRemove,
-  arrayUnion,
-  doc,
-  onSnapshot,
-  updateDoc,
-} from '@firebase/firestore';
+import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
+import { arrayRemove, arrayUnion, doc, updateDoc } from '@firebase/firestore';
 import { useEffect, useState } from 'react';
 import db from '@/app/firebase';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
@@ -27,35 +21,19 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   const { isUserDm } = useCampaign();
   const { user } = useUser();
 
-  const [board, setBoard] = useState<GameBoardType>();
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
   );
 
-  // Subscribe to receive live board updates
-  useEffect(() => {
-    const docRef = doc(db, 'gameBoards', props.boardId);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setBoard(docSnap.data() as GameBoardType);
-      } else {
-        console.error('The queried board does not exist.');
-      }
-    });
-    // Cleanup
-    return () => {
-      unsubscribe();
-    };
-  }, [props.boardId]);
-
   // Update board css class
   useEffect(() => {
     const gameBoard = document.querySelector('#game-board');
-    if (gameBoard && board) {
+    if (gameBoard && focusedBoard) {
+      const columns = `repeat(${focusedBoard.width}, minmax(0, 1fr))`;
       // @ts-ignore
-      gameBoard.style.gridTemplateColumns = `repeat(${board.width}, minmax(0, 1fr))`;
+      gameBoard.style.gridTemplateColumns = columns;
     }
-  }, [board?.width]);
+  }, [focusedBoard?.width]);
 
   const moveToken = async (coords: [number, number]) => {
     const docRef = doc(db, 'gameBoards', props.boardId);
@@ -99,7 +77,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   return (
     // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>
-      {board && (
+      {focusedBoard && (
         <DndContext
           onDragEnd={handleDragToken}
           collisionDetection={pointerWithin}
@@ -110,20 +88,20 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
             }}
             className="w-dvw h-full relative flex items-center justify-center border-2 border-red-400"
           >
-            {board?.backgroundImgURL && (
+            {focusedBoard?.backgroundImgURL && (
               <Image
-                src={board.backgroundImgURL}
-                width={CELL_SIZE * board.width}
-                height={CELL_SIZE * board.height}
-                alt={`${board.title}'s Background Image`}
+                src={focusedBoard.backgroundImgURL}
+                width={CELL_SIZE * focusedBoard.width}
+                height={CELL_SIZE * focusedBoard.height}
+                alt={`${focusedBoard.title}'s Background Image`}
                 className="absolute"
               />
             )}
             {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
             <div id="game-board" className="absolute">
-              {Array.from({ length: board.height }, (__, rowIndex) =>
-                Array.from({ length: board.width }, (__, colIndex) => {
-                  const token = board.activeTokens.reduce(
+              {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
+                Array.from({ length: focusedBoard.width }, (__, colIndex) => {
+                  const token = focusedBoard.activeTokens.reduce(
                     (
                       highestToken: ActiveGameBoardToken | null,
                       currentToken: ActiveGameBoardToken
@@ -141,7 +119,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                     null
                   );
                   const movable = isUserDm || token?.ownerId === user?.uid;
-                  // TODO: See if mouseDown logic can be placed onto Token. Seems like it'd make more sense
                   return (
                     <div key={`${colIndex},${rowIndex}`}>
                       <CellContextMenu

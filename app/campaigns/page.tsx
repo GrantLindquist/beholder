@@ -30,6 +30,22 @@ export default function Campaigns() {
 
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
 
+  // TODO: Figure out how to make campaign null when user enters campaign list page from campaign
+
+  useEffect(() => {
+    const fetchCampaignIds = async (userId: string) => {
+      const docRef = doc(db, 'users', userId);
+      const docSnap = await getDoc(docRef);
+      setCampaignIds(_.get(docSnap.data(), 'campaigns', []));
+    };
+    if (user) {
+      load(
+        fetchCampaignIds(user.uid),
+        'An error occurred while loading your campaigns.'
+      );
+    }
+  }, [user]);
+
   const handleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
@@ -62,21 +78,7 @@ export default function Campaigns() {
     // TODO: Complete sign-out w/ userSession and useUser
   };
 
-  useEffect(() => {
-    const fetchCampaignIds = async (userId: string) => {
-      const docRef = doc(db, 'users', userId);
-      const docSnap = await getDoc(docRef);
-      setCampaignIds(_.get(docSnap.data(), 'campaigns', []));
-    };
-    if (user) {
-      load(
-        fetchCampaignIds(user.uid),
-        'An error occurred while loading your campaigns.'
-      );
-    }
-  }, [user]);
-
-  // TODO: Investigate bug where sign-in page does not change after sign in
+  // TODO: Investigate bug where sign-in page does not change after sign in (SEE TODO IN useUser)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {user ? (

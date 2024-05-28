@@ -79,6 +79,7 @@ const CreateGameBoard = () => {
       const campaignRef = doc(db, 'campaigns', campaign.id);
       await updateDoc(campaignRef, {
         boardIds: arrayUnion(newBoard.id),
+        ...(campaign.focusedBoardId ? {} : { focusedBoardId: newBoard.id }),
       });
     }
   };

@@ -9,7 +9,6 @@ import {
   Table,
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import ActivePlayerList from '@/components/sections/ActivePlayerList';
 import {
   Tooltip,
   TooltipContent,
@@ -97,9 +96,7 @@ const SideNavbar = () => {
           </>
         )}
       </div>
-      <div className="mb-4">
-        <ActivePlayerList />
-      </div>
+      <div className="mb-4">{/*<ActivePlayerList />*/}</div>
       {/* TODO: Create a pending player join request component here */}
     </div>
   );

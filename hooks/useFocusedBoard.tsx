@@ -10,25 +10,25 @@ import {
 import { GameBoardType, SettingsEnum } from '@/types/GameBoardTypes';
 import { doc, onSnapshot, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
+import { useCampaign } from '@/hooks/useCampaign';
 
 const FocusedBoardContext = createContext<{
   focusedBoard: GameBoardType | null;
-  setFocusedBoardId: any;
   toggleSetting: (key: SettingsEnum, toggle: boolean) => void;
 }>({
   focusedBoard: null,
-  setFocusedBoardId: () => {},
   toggleSetting: () => {},
 });
 
 export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
-  const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
-  const [focusedBoardId, setFocusedBoardId] = useState<string | null>(null);
+  const { campaign } = useCampaign();
 
-  // TODO: Add live updates for board switching, prob a focusedBoardId campaign attribute?
+  const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
+
+  // TODO: Info toast for when DM switches focusedBoard? (solution probably doesn't belong here)
   useEffect(() => {
-    if (focusedBoardId) {
-      const boardDocRef = doc(db, 'gameBoards', focusedBoardId);
+    if (campaign?.focusedBoardId) {
+      const boardDocRef = doc(db, 'gameBoards', campaign.focusedBoardId);
       const unsubscribe = onSnapshot(boardDocRef, (boardDocSnap) => {
         if (boardDocSnap.exists()) {
           setFocusedBoard(boardDocSnap.data() as GameBoardType);
@@ -41,7 +41,7 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
         unsubscribe();
       };
     }
-  }, [focusedBoardId]);
+  }, [campaign?.focusedBoardId]);
 
   const toggleSetting = async (key: SettingsEnum, toggle: boolean) => {
     if (focusedBoard) {
@@ -56,9 +56,7 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <FocusedBoardContext.Provider
-      value={{ focusedBoard, setFocusedBoardId, toggleSetting }}
-    >
+    <FocusedBoardContext.Provider value={{ focusedBoard, toggleSetting }}>
       {children}
     </FocusedBoardContext.Provider>
   );
