@@ -97,7 +97,6 @@ const SideNavbar = () => {
         )}
       </div>
       <div className="mb-4">{/*<ActivePlayerList />*/}</div>
-      {/* TODO: Create a pending player join request component here */}
     </div>
   );
 };

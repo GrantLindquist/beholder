@@ -31,3 +31,7 @@ export const getUserFromSession = async () => {
   if (!session) return null;
   return await decrypt(session);
 };
+
+export const clearSession = async () => {
+  cookies().delete('session');
+};

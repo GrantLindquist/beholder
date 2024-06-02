@@ -73,7 +73,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   };
 
   // TODO: Make bg stretch to always perfectly fit cell grid
-  // TODO: Image caching?
   return (
     // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>

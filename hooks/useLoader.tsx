@@ -11,6 +11,7 @@ const LoaderContext = createContext<{
   load: () => {},
 });
 
+// TODO: Loader is no longer appearing??
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 

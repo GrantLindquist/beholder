@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { generateUUID } from '@/utils/uuid';
+import { generateStorageRef, generateUUID } from '@/utils/uuid';
 import { GameBoardType } from '@/types/GameBoardTypes';
 import NextImage from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -54,7 +54,10 @@ const CreateGameBoard = () => {
     const id = generateUUID();
 
     if (bgImage) {
-      const imageRef = ref(storage, `board/${values.title}-${id}`);
+      const imageRef = ref(
+        storage,
+        `board/${generateStorageRef(values.title, id)}`
+      );
       await uploadBytes(imageRef, bgImage);
       backgroundImgURL = await getDownloadURL(imageRef);
     }

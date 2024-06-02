@@ -4,7 +4,6 @@ import {
   getAdditionalUserInfo,
   GoogleAuthProvider,
   signInWithPopup,
-  signOut,
 } from '@firebase/auth';
 import db, { auth } from '@/app/firebase';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ import JoinCampaign from '@/components/sections/forms/JoinCampaign';
 import CreateCampaign from '@/components/sections/forms/CreateCampaign';
 
 export default function Campaigns() {
-  const { user } = useUser();
+  const { user, fetchUser, signOutUser } = useUser();
   const { load } = useLoader();
 
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
@@ -59,6 +58,7 @@ export default function Campaigns() {
           uid: user.uid,
         };
         await setUserSession(sessionUser);
+        fetchUser();
 
         const additionalUserInfo = getAdditionalUserInfo(result);
         if (_.get(additionalUserInfo, 'isNewUser')) {
@@ -72,13 +72,6 @@ export default function Campaigns() {
       });
   };
 
-  const handleSignOut = async () => {
-    await signOut(auth);
-
-    // TODO: Complete sign-out w/ userSession and useUser
-  };
-
-  // TODO: Investigate bug where sign-in page does not change after sign in (SEE TODO IN useUser)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {user ? (
@@ -101,7 +94,15 @@ export default function Campaigns() {
                 <CreateCampaign />
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" onClick={handleSignOut}>
+            <Button
+              variant="outline"
+              onClick={() =>
+                load(
+                  signOutUser(),
+                  'An error occurred while signing out of Google.'
+                )
+              }
+            >
               Sign-out
             </Button>
           </div>

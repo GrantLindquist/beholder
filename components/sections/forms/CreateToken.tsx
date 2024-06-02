@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { GameBoardToken } from '@/types/GameBoardTypes';
 import { doc, setDoc } from '@firebase/firestore';
 import db, { storage } from '@/app/firebase';
-import { generateUUID } from '@/utils/uuid';
+import { generateStorageRef, generateUUID } from '@/utils/uuid';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,7 +53,10 @@ const CreateToken = () => {
     const id = generateUUID();
 
     if (tokenImage) {
-      const imageRef = ref(storage, `token/${values.title}-${id}`);
+      const imageRef = ref(
+        storage,
+        `token/${generateStorageRef(values.title, id)}`
+      );
       await uploadBytes(imageRef, tokenImage);
       tokenImgURL = await getDownloadURL(imageRef);
     }

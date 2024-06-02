@@ -28,6 +28,7 @@ const ActivePlayerList = () => {
   const { load } = useLoader();
   const [activePlayers, setActivePlayers] = useState<UserSession[]>([]);
 
+  // TODO: A listener probably isn't necessary here. Just use useCampaign and map activePlayers + infinite re-render?
   useEffect(() => {
     if (campaign && user) {
       const player: UserSession = {

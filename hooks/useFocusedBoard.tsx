@@ -11,6 +11,7 @@ import { GameBoardType, SettingsEnum } from '@/types/GameBoardTypes';
 import { doc, onSnapshot, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import { useCampaign } from '@/hooks/useCampaign';
+import { useToast } from '@/components/ui/use-toast';
 
 const FocusedBoardContext = createContext<{
   focusedBoard: GameBoardType | null;
@@ -21,16 +22,22 @@ const FocusedBoardContext = createContext<{
 });
 
 export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
-  const { campaign } = useCampaign();
+  const { campaign, isUserDm } = useCampaign();
 
   const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
+  const { toast } = useToast();
 
-  // TODO: Info toast for when DM switches focusedBoard? (solution probably doesn't belong here)
   useEffect(() => {
     if (campaign?.focusedBoardId) {
       const boardDocRef = doc(db, 'gameBoards', campaign.focusedBoardId);
       const unsubscribe = onSnapshot(boardDocRef, (boardDocSnap) => {
         if (boardDocSnap.exists()) {
+          if (focusedBoard && !isUserDm) {
+            toast({
+              title: 'New Board',
+              description: `The DM has switched game board to "${boardDocSnap.data().title}"`,
+            });
+          }
           setFocusedBoard(boardDocSnap.data() as GameBoardType);
         } else {
           console.error('The queried board does not exist.');

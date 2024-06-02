@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   description: 'D&D fun time',
 };
 
-// TODO: Consolidate providers into grouped wrappers?
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">

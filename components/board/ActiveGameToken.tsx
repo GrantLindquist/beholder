@@ -7,7 +7,6 @@ import _ from 'lodash';
 import ConditionBadge from '@/components/board/ConditionBadge';
 import DeathBadge from '@/components/board/DeathBadge';
 
-// TODO: Image caching?
 const ActiveGameToken = (props: {
   token: ActiveGameBoardToken;
   selected?: boolean;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { arrayRemove, deleteDoc, doc, updateDoc } from '@firebase/firestore';
-import db from '@/app/firebase';
+import db, { storage } from '@/app/firebase';
 import { useCampaign } from '@/hooks/useCampaign';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
@@ -10,6 +10,9 @@ import GameBoard from '@/components/board/GameBoard';
 import { SearchIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
+import { deleteObject, ref } from '@firebase/storage';
+import { generateStorageRef } from '@/utils/uuid';
+import { Button } from '@/components/ui/button';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
@@ -33,10 +36,8 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   const handleMagnify = (newValue: number[]) => {
     setBoardScale(newValue[0]);
   };
-
-  // TODO: Delete applicable bgImage from cloud storage
   const handleDeleteBoard = async (boardId: string) => {
-    if (campaign) {
+    if (campaign && focusedBoard) {
       // Delete from game_boards
       const boardDocRef = doc(db, 'gameBoards', boardId);
       await deleteDoc(boardDocRef);
@@ -46,6 +47,15 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
       await updateDoc(campaignDocRef, {
         boardIds: arrayRemove(boardId),
       });
+
+      if (focusedBoard.backgroundImgURL) {
+        await deleteObject(
+          ref(
+            storage,
+            `board/${generateStorageRef(focusedBoard.title, boardId)}`
+          )
+        );
+      }
     }
   };
 
@@ -73,13 +83,13 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                   onValueChange={handleMagnify}
                 />
 
-                {/*<Button*/}
-                {/*  variant={'destructive'}*/}
-                {/*  onClick={() => handleDeleteBoard(focusedBoard.id)}*/}
-                {/*  className="relative bottom-0"*/}
-                {/*>*/}
-                {/*  Delete*/}
-                {/*</Button>*/}
+                <Button
+                  variant={'destructive'}
+                  onClick={() => handleDeleteBoard(focusedBoard.id)}
+                  className="relative bottom-0"
+                >
+                  Delete
+                </Button>
               </>
             )}
           </div>

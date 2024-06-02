@@ -6,40 +6,55 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { getUserFromSession } from '@/utils/userSession';
+import { clearSession, getUserFromSession } from '@/utils/userSession';
 import { UserSession } from '@/types/UserTypes';
 import { useLoader } from '@/hooks/useLoader';
+import { signOut } from '@firebase/auth';
+import { auth } from '@/app/firebase';
 
 const UserContext = createContext<{
   user: UserSession | null;
+  fetchUser: () => void;
+  signOutUser: () => Promise<any>;
 }>({
   user: null,
+  fetchUser: () => {},
+  signOutUser: async () => {},
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { load } = useLoader();
   const [user, setUser] = useState<UserSession | null>(null);
 
-  // TODO: This useEffect doesn't run when it should. Figure out how to signal it to run
+  // TODO: This doesn't work with a private browser. Is this worth fixing?
+  // TODO: IsUserDM is not being accurately set, may be causing above TODO
   useEffect(() => {
-    const fetchUser = async () => {
-      const session = await getUserFromSession();
-      const sessionUser = session?.user || null;
-      if (sessionUser) {
-        setUser({
-          displayName: sessionUser.displayName,
-          email: sessionUser.email,
-          photoURL: sessionUser.photoURL,
-          uid: sessionUser.uid,
-        });
-      }
-    };
-
     load(fetchUser(), 'An error occurred while loading the user.');
   }, []);
 
+  const fetchUser = async () => {
+    const session = await getUserFromSession();
+    const sessionUser = session?.user || null;
+    if (sessionUser) {
+      setUser({
+        displayName: sessionUser.displayName,
+        email: sessionUser.email,
+        photoURL: sessionUser.photoURL,
+        uid: sessionUser.uid,
+      });
+    }
+  };
+
+  const signOutUser = async () => {
+    await signOut(auth);
+    await clearSession();
+    setUser(null);
+  };
+
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, fetchUser, signOutUser }}>
+      {children}
+    </UserContext.Provider>
   );
 };
 
