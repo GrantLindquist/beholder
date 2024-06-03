@@ -26,8 +26,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { load } = useLoader();
   const [user, setUser] = useState<UserSession | null>(null);
 
-  // TODO: This doesn't work with a private browser. Is this worth fixing?
-  // TODO: IsUserDM is not being accurately set, may be causing above TODO
   useEffect(() => {
     load(fetchUser(), 'An error occurred while loading the user.');
   }, []);

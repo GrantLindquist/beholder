@@ -120,7 +120,7 @@ const TokenList = (props: { placeCoord?: [number, number] }) => {
   return (
     <>
       <Input placeholder="Search" className="my-2" onChange={handleSearch} />
-      <div className="grid grid-cols-2 space-x-2 space-y-2">
+      <div className="grid grid-cols-2 space-x-2 space-y-2 max-h-60 overflow-auto">
         {tokens.map((token) => {
           if (
             (isUserDm || !token.isMonster) &&

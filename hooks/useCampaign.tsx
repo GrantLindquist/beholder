@@ -34,18 +34,15 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
 
   const [isUserDm, setIsUserDm] = useState<boolean | null>(null);
 
-  console.log(campaign);
-
   useEffect(() => {
-    // TODO: There's an anti-pattern here - campaignId or user not existing is worthy of error UI, yet it is swallowed. Keep in mind that id should be null while loading, do not cause that functionality to break
-    if (campaignId) {
+    if (campaignId && user) {
       try {
         const unsubscribe = onSnapshot(
           doc(db, 'campaigns', campaignId),
           (docSnap) => {
             if (docSnap.exists()) {
               setCampaign(docSnap.data() as CampaignType);
-              setIsUserDm(docSnap.data().dmId === user?.uid);
+              setIsUserDm(docSnap.data().dmId === user.uid);
             } else {
               console.error('The queried campaign does not exist.');
             }
@@ -62,7 +59,7 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     }
-  }, [campaignId]);
+  }, [campaignId, user]);
 
   return (
     <CampaignContext.Provider value={{ campaign, setCampaignId, isUserDm }}>

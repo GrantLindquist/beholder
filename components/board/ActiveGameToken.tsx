@@ -48,10 +48,13 @@ const ActiveGameToken = (props: {
         </div>
       </div>
       <div className="bg-gray-300 bg-opacity-70 text-zinc-950 rounded relative w-fit mt-1">
-        <p className="text-xs text-center px-1.5">
-          {props.token.title}
-          {props.token.monsterNumber && `\u00A0(${props.token.monsterNumber})`}
-        </p>
+        {!props.token.dead && (
+          <p className="text-xs text-center px-1.5">
+            {props.token.title}
+            {props.token.monsterNumber &&
+              `\u00A0(${props.token.monsterNumber})`}
+          </p>
+        )}
       </div>
     </>
   );

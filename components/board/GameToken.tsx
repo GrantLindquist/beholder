@@ -3,7 +3,6 @@ import Image from 'next/image';
 import DEFAULT_AVATAR from '@/public/assets/default_token.jpg';
 import { CELL_SIZE } from '@/app/globals';
 
-// TODO: Image caching?
 const GameToken = (props: { token: GameBoardToken; selected?: boolean }) => {
   return (
     <div className="max-w-12">

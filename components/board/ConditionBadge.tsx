@@ -10,7 +10,7 @@ const ConditionBadge = (props: { conditions: string[] }) => {
     <div className="absolute top-0 right-0 z-10">
       <Tooltip>
         <TooltipTrigger>
-          <div className="border-2 border-white rounded-full bg-black">
+          <div className="border-2 border-white size-5 flex items-center justify-center rounded-full bg-black">
             <p className="text-xs mx-1">{_.size(props.conditions)}</p>
           </div>
         </TooltipTrigger>

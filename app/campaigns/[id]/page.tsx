@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { arrayRemove, deleteDoc, doc, updateDoc } from '@firebase/firestore';
+import {
+  arrayRemove,
+  arrayUnion,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from '@firebase/firestore';
 import db, { storage } from '@/app/firebase';
 import { useCampaign } from '@/hooks/useCampaign';
 import SideNavbar from '@/components/sections/SideNavbar';
@@ -9,13 +15,15 @@ import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
 import { SearchIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
+import { CELL_SIZE, DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
 import { deleteObject, ref } from '@firebase/storage';
 import { generateStorageRef } from '@/utils/uuid';
-import { Button } from '@/components/ui/button';
+import { UserSession } from '@/types/UserTypes';
+import { useUser } from '@/hooks/useUser';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
+  const { user } = useUser();
   const { focusedBoard } = useFocusedBoard();
 
   const [boardScale, setBoardScale] = useState(1);
@@ -31,6 +39,34 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     setCampaignId(params.id);
+
+    const addPlayer = async (player: UserSession) => {
+      campaign &&
+        (await updateDoc(doc(db, 'campaigns', campaign.id), {
+          activePlayers: arrayUnion(player),
+        }));
+    };
+
+    const removePlayer = async (player: UserSession) => {
+      campaign &&
+        (await updateDoc(doc(db, 'campaigns', campaign.id), {
+          activePlayers: arrayRemove(player),
+        }));
+    };
+
+    if (user) {
+      const player: UserSession = {
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      };
+
+      addPlayer(player);
+      return () => {
+        removePlayer(player);
+      };
+    }
   }, [params.id]);
 
   const handleMagnify = (newValue: number[]) => {
@@ -64,7 +100,15 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
       {campaign ? (
         <>
           <SideNavbar />
-          <div className="w-full h-full flex items-center justify-center">
+          <div
+            style={{
+              minWidth: focusedBoard ? focusedBoard.width * CELL_SIZE : '100%',
+              minHeight: focusedBoard
+                ? focusedBoard.height * CELL_SIZE
+                : '100%',
+            }}
+            className="w-full h-full flex items-center justify-center"
+          >
             {focusedBoard?.id ? (
               <GameBoard scale={boardScale} boardId={focusedBoard.id} />
             ) : (
@@ -83,13 +127,13 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                   onValueChange={handleMagnify}
                 />
 
-                <Button
-                  variant={'destructive'}
-                  onClick={() => handleDeleteBoard(focusedBoard.id)}
-                  className="relative bottom-0"
-                >
-                  Delete
-                </Button>
+                {/*<Button*/}
+                {/*  variant={'destructive'}*/}
+                {/*  onClick={() => handleDeleteBoard(focusedBoard.id)}*/}
+                {/*  className="relative bottom-0"*/}
+                {/*>*/}
+                {/*  Delete*/}
+                {/*</Button>*/}
               </>
             )}
           </div>

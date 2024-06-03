@@ -11,10 +11,10 @@ import Image from 'next/image';
 import ActiveGameToken from '@/components/board/ActiveGameToken';
 import _ from 'lodash';
 import FogOfWar from '@/components/board/FogOfWar';
-import { useCampaign } from '@/hooks/useCampaign';
-import { useUser } from '@/hooks/useUser';
 import CellContextMenu from '@/components/board/CellContextMenu';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
+import { useUser } from '@/hooks/useUser';
+import { useCampaign } from '@/hooks/useCampaign';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
   const { focusedBoard } = useFocusedBoard();
@@ -24,16 +24,20 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
   );
+  const [dimensionsClass, setDimensionsClass] = useState('');
 
   // Update board css class
   useEffect(() => {
     const gameBoard = document.querySelector('#game-board');
     if (gameBoard && focusedBoard) {
-      const columns = `repeat(${focusedBoard.width}, minmax(0, 1fr))`;
+      const columns = `repeat(${focusedBoard.width}, minmax(${CELL_SIZE}px, ${CELL_SIZE}px))`;
+      const rows = `repeat(${focusedBoard.height}, minmax(${CELL_SIZE}px, ${CELL_SIZE}px))`;
       // @ts-ignore
       gameBoard.style.gridTemplateColumns = columns;
+      // @ts-ignore
+      gameBoard.style.gridTemplateRows = rows;
     }
-  }, [focusedBoard?.width]);
+  }, [focusedBoard?.width, focusedBoard?.height]);
 
   const moveToken = async (coords: [number, number]) => {
     const docRef = doc(db, 'gameBoards', props.boardId);
@@ -72,7 +76,6 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     }
   };
 
-  // TODO: Make bg stretch to always perfectly fit cell grid
   return (
     // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>
@@ -84,8 +87,10 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
           <div
             style={{
               transform: `scale(${props.scale})`,
+              width: focusedBoard.width * CELL_SIZE,
+              height: focusedBoard.height * CELL_SIZE,
             }}
-            className="w-dvw h-full relative flex items-center justify-center border-2 border-red-400"
+            className={`relative border-2 border-red-400`}
           >
             {focusedBoard?.backgroundImgURL && (
               <Image
@@ -93,11 +98,11 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
                 width={CELL_SIZE * focusedBoard.width}
                 height={CELL_SIZE * focusedBoard.height}
                 alt={`${focusedBoard.title}'s Background Image`}
-                className="absolute"
+                className="absolute w-full h-full"
               />
             )}
             {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
-            <div id="game-board" className="absolute">
+            <div id="game-board" className="absolute w-full h-full">
               {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
                 Array.from({ length: focusedBoard.width }, (__, colIndex) => {
                   const token = focusedBoard.activeTokens.reduce(

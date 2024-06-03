@@ -35,6 +35,13 @@ import SettingsMenu from '@/components/sections/SettingsMenu';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import EditFogOfWar from '@/components/misc/EditFogOfWar';
+import ActivePlayerList from '@/components/sections/ActivePlayerList';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 // TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
@@ -66,16 +73,20 @@ const SideNavbar = () => {
         {focusedBoard && (
           <>
             <SideNavbarButton title={'Game Tokens'} icon={<SmilePlus />}>
-              <DropdownMenuLabel>Your Tokens</DropdownMenuLabel>
-              <TokenList />
-              <Collapsible>
-                <CollapsibleTrigger>
-                  <DropdownMenuLabel>Create New Token</DropdownMenuLabel>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <CreateToken />
-                </CollapsibleContent>
-              </Collapsible>
+              <Accordion type="multiple" className="w-48 max-w-48">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Place Token</AccordionTrigger>
+                  <AccordionContent>
+                    <TokenList />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger>Create New Token</AccordionTrigger>
+                  <AccordionContent>
+                    <CreateToken />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </SideNavbarButton>
             <SideNavbarButton
               title={'Paint'}
@@ -96,7 +107,9 @@ const SideNavbar = () => {
           </>
         )}
       </div>
-      <div className="mb-4">{/*<ActivePlayerList />*/}</div>
+      <div className="mb-4">
+        <ActivePlayerList />
+      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { useFow } from '@/hooks/useFow';
 import _ from 'lodash';
 import db from '@/app/firebase';
 import { arrayRemove, arrayUnion, doc, updateDoc } from '@firebase/firestore';
+import { CELL_SIZE } from '@/app/globals';
 
 const FogOfWar = () => {
   const { focusedBoard } = useFocusedBoard();
@@ -18,8 +19,12 @@ const FogOfWar = () => {
   useEffect(() => {
     const fogOfWar = document.querySelector('#fog-of-war');
     if (fogOfWar && focusedBoard) {
+      const columns = `repeat(${focusedBoard.width}, minmax(${CELL_SIZE}px, ${CELL_SIZE}px))`;
+      const rows = `repeat(${focusedBoard.height}, minmax(${CELL_SIZE}px, ${CELL_SIZE}px))`;
       // @ts-ignore
-      fogOfWar.style.gridTemplateColumns = `repeat(${focusedBoard.width}, minmax(0, 1fr))`;
+      fogOfWar.style.gridTemplateColumns = columns;
+      // @ts-ignore
+      fogOfWar.style.gridTemplateRows = rows;
     }
   }, [focusedBoard?.width]);
 
@@ -37,6 +42,7 @@ const FogOfWar = () => {
     }
   };
 
+  // TODO: Size-full makes FOW disappear?
   return (
     <>
       {focusedBoard && (
@@ -46,7 +52,7 @@ const FogOfWar = () => {
               return (
                 <div
                   key={`fow-${colIndex},${rowIndex}`}
-                  className={`size-12 ${focusedBoard.fowCells?.includes(`${colIndex},${rowIndex}`) ? 'bg-black' : ''}  z-50 ${_.isNull(eraseFow) ? 'pointer-events-none' : ''} ${isUserDm ? 'bg-opacity-70' : 'border-2 border-black'} ${eraseFow ? 'cursor-erase' : ''} ${eraseFow === false ? 'cursor-draw' : ''}`}
+                  className={`size-full ${focusedBoard.fowCells?.includes(`${colIndex},${rowIndex}`) ? 'bg-black' : ''}  z-50 ${_.isNull(eraseFow) ? 'pointer-events-none' : ''} ${isUserDm ? 'bg-opacity-70' : 'border-2 border-black'} ${eraseFow ? 'cursor-erase' : ''} ${eraseFow === false ? 'cursor-draw' : ''}`}
                   onMouseOver={() =>
                     !_.isNull(eraseFow) &&
                     mouseDown &&
