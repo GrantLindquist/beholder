@@ -34,6 +34,7 @@ const TokenList = (props: { placeCoord?: [number, number] }) => {
   const [disablePlaceButton, setDisablePlaceButton] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  // TODO: Implement loading state here
   useEffect(() => {
     const fetchTokens = async () => {
       const q = query(

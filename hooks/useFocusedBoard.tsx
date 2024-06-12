@@ -7,18 +7,34 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { GameBoardType, SettingsEnum } from '@/types/GameBoardTypes';
-import { doc, onSnapshot, updateDoc } from '@firebase/firestore';
+import {
+  ActiveGameBoardToken,
+  GameBoardType,
+  SettingsEnum,
+} from '@/types/GameBoardTypes';
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  updateDoc,
+  writeBatch,
+} from '@firebase/firestore';
 import db from '@/app/firebase';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useToast } from '@/components/ui/use-toast';
 
 const FocusedBoardContext = createContext<{
   focusedBoard: GameBoardType | null;
-  toggleSetting: (key: SettingsEnum, toggle: boolean) => void;
+  toggleSetting: (key: SettingsEnum, toggle: boolean) => Promise<void>;
+  updateToken: (
+    tokenRef: ActiveGameBoardToken,
+    updates: Object
+  ) => Promise<void>;
 }>({
   focusedBoard: null,
-  toggleSetting: () => {},
+  toggleSetting: async () => {},
+  updateToken: async () => {},
 });
 
 export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
@@ -35,7 +51,12 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
           if (focusedBoard && !isUserDm) {
             toast({
               title: 'New Board',
-              description: `The DM has switched game board to "${boardDocSnap.data().title}"`,
+              description: (
+                <p>
+                  The DM has switched game board to{' '}
+                  <b>{boardDocSnap.data().title}</b>
+                </p>
+              ),
             });
           }
           setFocusedBoard(boardDocSnap.data() as GameBoardType);
@@ -62,8 +83,49 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateToken = async (
+    tokenRef: ActiveGameBoardToken,
+    updates: Object
+  ) => {
+    if (focusedBoard) {
+      // Optimistically update state before sending data to firebase
+      const docRef = doc(db, 'gameBoards', focusedBoard.id);
+      const index = focusedBoard.activeTokens.findIndex(
+        (token) => token.id === tokenRef.id
+      );
+
+      if (index !== -1) {
+        const tokens = focusedBoard.activeTokens;
+        tokens[index] = {
+          ...tokens[index],
+          ...updates,
+        };
+
+        setFocusedBoard({
+          ...focusedBoard,
+          activeTokens: tokens,
+        });
+      }
+
+      // Update token in firebase
+      const batch = writeBatch(db);
+      batch.update(docRef, {
+        activeTokens: arrayRemove(tokenRef),
+      });
+      batch.update(docRef, {
+        activeTokens: arrayUnion({
+          ...tokenRef,
+          ...updates,
+        }),
+      });
+      await batch.commit();
+    }
+  };
+
   return (
-    <FocusedBoardContext.Provider value={{ focusedBoard, toggleSetting }}>
+    <FocusedBoardContext.Provider
+      value={{ focusedBoard, toggleSetting, updateToken }}
+    >
       {children}
     </FocusedBoardContext.Provider>
   );

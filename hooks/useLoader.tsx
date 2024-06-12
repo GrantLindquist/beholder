@@ -11,7 +11,6 @@ const LoaderContext = createContext<{
   load: () => {},
 });
 
-// TODO: Loader is no longer appearing??
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
@@ -22,7 +21,7 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
     error: string,
     hideLoader?: boolean
   ) => {
-    !loadingUI && hideLoader && setLoadingUI(true);
+    !loadingUI && !hideLoader && setLoadingUI(true);
     try {
       await promise;
       setLoadingUI(false);

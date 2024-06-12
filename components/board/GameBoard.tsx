@@ -1,9 +1,7 @@
 'use client';
 
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
-import { arrayRemove, arrayUnion, doc, updateDoc } from '@firebase/firestore';
 import { useEffect, useState } from 'react';
-import db from '@/app/firebase';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { GameBoardCell } from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
@@ -17,14 +15,13 @@ import { useUser } from '@/hooks/useUser';
 import { useCampaign } from '@/hooks/useCampaign';
 
 const GameBoard = (props: { scale: number; boardId: string }) => {
-  const { focusedBoard } = useFocusedBoard();
+  const { focusedBoard, updateToken } = useFocusedBoard();
   const { isUserDm } = useCampaign();
   const { user } = useUser();
 
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
   );
-  const [dimensionsClass, setDimensionsClass] = useState('');
 
   // Update board css class
   useEffect(() => {
@@ -40,25 +37,16 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   }, [focusedBoard?.width, focusedBoard?.height]);
 
   const moveToken = async (coords: [number, number]) => {
-    const docRef = doc(db, 'gameBoards', props.boardId);
     const movingTokenRef = _.cloneDeep(movingToken);
     setMovingToken(null);
 
-    // TODO: Is removing entire token instead of updating nested value really the best option here?
-    await updateDoc(docRef, {
-      activeTokens: arrayRemove(movingTokenRef),
-    });
-
-    await updateDoc(docRef, {
-      activeTokens: arrayUnion({
-        ...movingTokenRef,
+    movingTokenRef &&
+      (await updateToken(movingTokenRef, {
         boardPosition: coords,
         lastMovedAt: Date.now(),
-      }),
-    });
+      }));
   };
 
-  // TODO: Figure out how to prevent handleDragToken from triggering "too many re-renders" warning
   const handleDragToken = async (event: any) => {
     const { over } = event;
     if (over && movingToken) {
@@ -76,6 +64,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
     }
   };
 
+  // TODO: Override zoom computer zoom gesture with slider zoom
   return (
     // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>
@@ -90,7 +79,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
               width: focusedBoard.width * CELL_SIZE,
               height: focusedBoard.height * CELL_SIZE,
             }}
-            className={`relative border-2 border-red-400`}
+            className={`relative`}
           >
             {focusedBoard?.backgroundImgURL && (
               <Image

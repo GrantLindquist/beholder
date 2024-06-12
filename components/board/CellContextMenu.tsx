@@ -46,6 +46,7 @@ const CellContextMenu = ({
     }
   };
 
+  // TODO: Use updateToken here
   const handleUpdateDeathState = async (event: any, dead: boolean) => {
     event.stopPropagation();
     if (focusedBoard) {
@@ -74,14 +75,16 @@ const CellContextMenu = ({
           {!disabled && (
             <>
               <ContextMenuSeparator />
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <ContextMenuItem>Conditions</ContextMenuItem>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="max-w-72 ml-3">
-                  <ConditionList token={token} />
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {!token.dead && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <ContextMenuItem>Conditions</ContextMenuItem>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="max-w-72 ml-3">
+                    <ConditionList token={token} />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               <ContextMenuItem
                 onClick={(event) => handleUpdateDeathState(event, !token.dead)}
               >

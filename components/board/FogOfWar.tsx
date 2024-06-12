@@ -42,7 +42,6 @@ const FogOfWar = () => {
     }
   };
 
-  // TODO: Size-full makes FOW disappear?
   return (
     <>
       {focusedBoard && (

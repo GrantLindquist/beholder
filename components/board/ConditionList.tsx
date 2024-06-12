@@ -1,80 +1,50 @@
 'use client';
 
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import _ from 'lodash';
-import { arrayRemove, arrayUnion, doc, updateDoc } from '@firebase/firestore';
-import db from '@/app/firebase';
 
 const ConditionList = (props: { token: ActiveGameBoardToken }) => {
-  const { focusedBoard } = useFocusedBoard();
-  const [conditions, setConditions] = useState<string[]>([]);
+  const { updateToken } = useFocusedBoard();
   const [isAdding, setIsAdding] = useState(false);
   const [selectedCondition, setSelectedCondition] = useState<string | null>(
     null
   );
 
-  useEffect(() => {
-    if (focusedBoard) {
-      const viewedToken = focusedBoard?.activeTokens.find(
-        (t) => t.id === props.token.id
-      );
-      setConditions(viewedToken?.conditions ?? []);
-    }
-  }, [props.token.id]);
-
+  // TODO: Something weird is happening here. Maybe a race condition? Or perhaps optimistic bug?
   const handleAddCondition = async (event: any) => {
     event.preventDefault();
-    let newConditions = conditions;
+    let newConditions = props.token.conditions || [];
     newConditions.push(event.target[0].value);
 
-    if (focusedBoard) {
-      // TODO: Create an optimistic update utility to handle this better (or find a better way to update tokens)
-      const docRef = doc(db, 'gameBoards', focusedBoard.id);
-      await updateDoc(docRef, {
-        activeTokens: arrayRemove(props.token),
-      });
+    console.log(newConditions);
 
-      await updateDoc(docRef, {
-        activeTokens: arrayUnion({
-          ...props.token,
-          conditions: newConditions,
-        }),
-      });
-    }
+    await updateToken(props.token, {
+      conditions: newConditions,
+    });
 
     setIsAdding(false);
   };
 
   const handleDeleteCondition = async (condition: string) => {
-    let newConditions = conditions.filter((c) => c !== condition);
+    let newConditions =
+      props.token.conditions.filter((c) => c !== condition) || [];
 
-    if (focusedBoard) {
-      // TODO: Create an optimistic update utility to handle this better (or find a better way to update tokens)
-      const docRef = doc(db, 'gameBoards', focusedBoard.id);
-      await updateDoc(docRef, {
-        activeTokens: arrayRemove(props.token),
-      });
-
-      await updateDoc(docRef, {
-        activeTokens: arrayUnion({
-          ...props.token,
-          conditions: newConditions,
-        }),
-      });
-    }
+    await updateToken(props.token, {
+      conditions: newConditions,
+    });
 
     setSelectedCondition(null);
   };
 
   return (
     <div className="m-2">
-      {_.size(conditions) > 0 ? (
+      {_.size(props.token.conditions) > 0 ? (
         <div className="space-y-1 my-2">
-          {conditions.map((condition) => (
+          {props.token.conditions.map((condition) => (
             <div
               key={`${props.token.id}-${condition}}`}
               className={`${condition === selectedCondition ? 'bg-gray-800' : ''} text-sm rounded hover:bg-gray-800`}
