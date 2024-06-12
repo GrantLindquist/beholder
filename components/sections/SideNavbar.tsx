@@ -49,7 +49,7 @@ const SideNavbar = () => {
   const { focusedBoard } = useFocusedBoard();
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-20 flex flex-col items-center bg-gray-900 z-10 p-2">
+    <div className="h-screen w-20 flex flex-col items-center bg-gray-900 z-10 p-2">
       <Link href={'/'}>
         <SideNavbarButton title={'Leave Campaign'} icon={<DoorOpen />} />
       </Link>

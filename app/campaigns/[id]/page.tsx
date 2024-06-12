@@ -13,8 +13,6 @@ import { useCampaign } from '@/hooks/useCampaign';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
-import { SearchIcon } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
 import { CELL_SIZE, DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
 import { deleteObject, ref } from '@firebase/storage';
 import { generateStorageRef } from '@/utils/uuid';
@@ -22,7 +20,6 @@ import { UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
 import _ from 'lodash';
 
-// TODO: Show loading state instead of "campaign does not exist"
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
   const { user } = useUser();
@@ -71,9 +68,6 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
     }
   }, [params.id]);
 
-  const handleMagnify = (newValue: number[]) => {
-    setBoardScale(newValue[0]);
-  };
   const handleDeleteBoard = async (boardId: string) => {
     if (campaign && focusedBoard) {
       // Delete from game_boards
@@ -97,54 +91,29 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
     }
   };
 
-  // TODO: Implement loading state - it may fix hydration error?
   return (
     <div className="w-screen h-screen flex flex-row">
       {!_.isUndefined(campaign) ? (
         <>
           <SideNavbar />
           {!_.isNull(campaign) && (
-            <>
-              <div
-                style={{
-                  minWidth: focusedBoard
-                    ? focusedBoard.width * CELL_SIZE
-                    : '100%',
-                  minHeight: focusedBoard
-                    ? focusedBoard.height * CELL_SIZE
-                    : '100%',
-                }}
-                className="w-full h-full flex items-center justify-center"
-              >
-                {focusedBoard?.id ? (
-                  <GameBoard scale={boardScale} boardId={focusedBoard.id} />
-                ) : (
-                  <p>There are no active boards for this campaign.</p>
-                )}
-              </div>
-              <div className="fixed top-0 right-0 w-32 my-3 mx-6 space-x-3 flex flex-row z-10 items-center">
-                {focusedBoard?.id && (
-                  <>
-                    <SearchIcon />
-                    <Slider
-                      defaultValue={[1]}
-                      min={0.3}
-                      max={3}
-                      step={0.1}
-                      onValueChange={handleMagnify}
-                    />
-
-                    {/*<Button*/}
-                    {/*  variant={'destructive'}*/}
-                    {/*  onClick={() => handleDeleteBoard(focusedBoard.id)}*/}
-                    {/*  className="relative bottom-0"*/}
-                    {/*>*/}
-                    {/*  Delete*/}
-                    {/*</Button>*/}
-                  </>
-                )}
-              </div>
-            </>
+            <div
+              style={{
+                minWidth: focusedBoard
+                  ? focusedBoard.width * CELL_SIZE
+                  : '100%',
+                minHeight: focusedBoard
+                  ? focusedBoard.height * CELL_SIZE
+                  : '100%',
+              }}
+              className="w-full h-full flex items-center justify-center"
+            >
+              {focusedBoard?.id ? (
+                <GameBoard />
+              ) : (
+                <p>There are no active boards for this campaign.</p>
+              )}
+            </div>
           )}
         </>
       ) : (
