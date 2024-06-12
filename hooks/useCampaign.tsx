@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
 
 const CampaignContext = createContext<{
-  campaign: CampaignType | null;
+  campaign: CampaignType | null | undefined;
   setCampaignId: Dispatch<SetStateAction<string | null>>;
   isUserDm: boolean | null;
 }>({
@@ -29,7 +29,9 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
   const { user } = useUser();
 
-  const [campaign, setCampaign] = useState<CampaignType | null>(null);
+  const [campaign, setCampaign] = useState<CampaignType | null | undefined>(
+    null
+  );
   const [campaignId, setCampaignId] = useState<string | null>(null);
 
   const [isUserDm, setIsUserDm] = useState<boolean | null>(null);
@@ -44,7 +46,7 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
               setCampaign(docSnap.data() as CampaignType);
               setIsUserDm(docSnap.data().dmId === user.uid);
             } else {
-              console.error('The queried campaign does not exist.');
+              setCampaign(undefined);
             }
           }
         );

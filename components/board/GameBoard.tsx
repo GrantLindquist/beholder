@@ -65,6 +65,7 @@ const GameBoard = (props: { scale: number; boardId: string }) => {
   };
 
   // TODO: Override zoom computer zoom gesture with slider zoom
+  // TODO: Activate overflow when game board scale exceeds viewport
   return (
     // DO NOT GIVE THIS COMPONENT ANY SIBLINGS!!! IT WILL BREAK THE BOARD
     <>
