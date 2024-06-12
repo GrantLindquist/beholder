@@ -11,7 +11,7 @@ import {
 import { ReactNode } from 'react';
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
-import { arrayRemove, arrayUnion, doc, updateDoc } from '@firebase/firestore';
+import { arrayRemove, doc, updateDoc } from '@firebase/firestore';
 import db from '@/app/firebase';
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ const CellContextMenu = ({
   disabled,
   children,
 }: CellContextMenuProps) => {
-  const { focusedBoard } = useFocusedBoard();
+  const { focusedBoard, updateToken } = useFocusedBoard();
 
   const handleRemoveToken = async (event: any) => {
     event.stopPropagation();
@@ -46,21 +46,12 @@ const CellContextMenu = ({
     }
   };
 
-  // TODO: Use updateToken here
   const handleUpdateDeathState = async (event: any, dead: boolean) => {
     event.stopPropagation();
-    if (focusedBoard) {
-      const boardDocRef = doc(db, 'gameBoards', focusedBoard.id);
-      await updateDoc(boardDocRef, {
-        activeTokens: arrayRemove(token),
-      });
-      await updateDoc(boardDocRef, {
-        activeTokens: arrayUnion({
-          ...token,
-          dead: dead,
-        }),
-      });
-    }
+    token &&
+      (await updateToken(token, {
+        dead: dead,
+      }));
   };
 
   return (

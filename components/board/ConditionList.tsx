@@ -14,13 +14,10 @@ const ConditionList = (props: { token: ActiveGameBoardToken }) => {
     null
   );
 
-  // TODO: Something weird is happening here. Maybe a race condition? Or perhaps optimistic bug?
   const handleAddCondition = async (event: any) => {
     event.preventDefault();
     let newConditions = props.token.conditions || [];
     newConditions.push(event.target[0].value);
-
-    console.log(newConditions);
 
     await updateToken(props.token, {
       conditions: newConditions,

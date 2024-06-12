@@ -21,6 +21,7 @@ import { generateStorageRef } from '@/utils/uuid';
 import { UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
 
+// TODO: Show loading state instead of "campaign does not exist"
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
   const { user } = useUser();

@@ -13,16 +13,15 @@ import {
   SettingsEnum,
 } from '@/types/GameBoardTypes';
 import {
-  arrayRemove,
-  arrayUnion,
   doc,
   onSnapshot,
+  runTransaction,
   updateDoc,
-  writeBatch,
 } from '@firebase/firestore';
 import db from '@/app/firebase';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useToast } from '@/components/ui/use-toast';
+import { useLoader } from '@/hooks/useLoader';
 
 const FocusedBoardContext = createContext<{
   focusedBoard: GameBoardType | null;
@@ -42,6 +41,7 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
 
   const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
   const { toast } = useToast();
+  const { load } = useLoader();
 
   useEffect(() => {
     if (campaign?.focusedBoardId) {
@@ -105,20 +105,15 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
           ...focusedBoard,
           activeTokens: tokens,
         });
-      }
 
-      // Update token in firebase
-      const batch = writeBatch(db);
-      batch.update(docRef, {
-        activeTokens: arrayRemove(tokenRef),
-      });
-      batch.update(docRef, {
-        activeTokens: arrayUnion({
-          ...tokenRef,
-          ...updates,
-        }),
-      });
-      await batch.commit();
+        load(
+          runTransaction(db, async (transaction) => {
+            transaction.update(docRef, { activeTokens: tokens });
+          }),
+          "An error occurred while moving your token. Other player's may not be able to see your movement.",
+          true
+        );
+      }
     }
   };
 

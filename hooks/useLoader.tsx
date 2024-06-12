@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Loader } from '@/components/misc/Loader';
 
 const LoaderContext = createContext<{
-  load: (promise: Promise<any>, error: string, displayLoader?: boolean) => void;
+  load: (promise: Promise<any>, error: string, hideLoader?: boolean) => void;
 }>({
   load: () => {},
 });
