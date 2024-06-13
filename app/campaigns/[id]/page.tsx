@@ -13,28 +13,19 @@ import { useCampaign } from '@/hooks/useCampaign';
 import SideNavbar from '@/components/sections/SideNavbar';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import GameBoard from '@/components/board/GameBoard';
-import { CELL_SIZE, DEFAULT_BOARD_HEIGHT_SCALE } from '@/app/globals';
 import { deleteObject, ref } from '@firebase/storage';
 import { generateStorageRef } from '@/utils/uuid';
 import { UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
 import _ from 'lodash';
+import { TransformWrapper } from 'react-zoom-pan-pinch';
 
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
   const { user } = useUser();
   const { focusedBoard } = useFocusedBoard();
 
-  const [boardScale, setBoardScale] = useState(1);
-
-  useEffect(() => {
-    const smallestDimension = focusedBoard
-      ? focusedBoard?.width > focusedBoard?.height
-        ? focusedBoard?.width
-        : focusedBoard?.height
-      : DEFAULT_BOARD_HEIGHT_SCALE;
-    setBoardScale(DEFAULT_BOARD_HEIGHT_SCALE / smallestDimension);
-  }, [focusedBoard?.id]);
+  const [disableBoardGestures, setDisableBoardGestures] = useState(false);
 
   useEffect(() => {
     setCampaignId(params.id);
@@ -97,19 +88,18 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
         <>
           <SideNavbar />
           {!_.isNull(campaign) && (
-            <div
-              style={{
-                minWidth: focusedBoard
-                  ? focusedBoard.width * CELL_SIZE
-                  : '100%',
-                minHeight: focusedBoard
-                  ? focusedBoard.height * CELL_SIZE
-                  : '100%',
-              }}
-              className="w-full h-full flex items-center justify-center"
-            >
+            <div className="w-full h-full flex items-center justify-center overflow-hidden">
               {focusedBoard?.id ? (
-                <GameBoard />
+                <TransformWrapper
+                  minScale={0.5}
+                  disabled={disableBoardGestures}
+                >
+                  <GameBoard
+                    toggleBoardGestures={(toggle: boolean) =>
+                      setDisableBoardGestures(toggle)
+                    }
+                  />
+                </TransformWrapper>
               ) : (
                 <p>There are no active boards for this campaign.</p>
               )}

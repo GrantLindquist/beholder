@@ -13,17 +13,19 @@ import CellContextMenu from '@/components/board/CellContextMenu';
 import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 import { useUser } from '@/hooks/useUser';
 import { useCampaign } from '@/hooks/useCampaign';
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { TransformComponent, useControls } from 'react-zoom-pan-pinch';
 
-const GameBoard = () => {
+const GameBoard = (props: { toggleBoardGestures: Function }) => {
   const { focusedBoard, updateToken } = useFocusedBoard();
   const { isUserDm } = useCampaign();
   const { user } = useUser();
+  const { resetTransform } = useControls();
 
   const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
     null
   );
 
+  // TODO: Get resetTransform() to trigger when page loads / on refresh
   // Update board css class
   useEffect(() => {
     const gameBoard = document.querySelector('#game-board');
@@ -35,7 +37,12 @@ const GameBoard = () => {
       // @ts-ignore
       gameBoard.style.gridTemplateRows = rows;
     }
+    resetTransform();
   }, [focusedBoard?.width, focusedBoard?.height]);
+
+  useEffect(() => {
+    props.toggleBoardGestures(movingToken);
+  }, [movingToken]);
 
   const moveToken = async (coords: [number, number]) => {
     const movingTokenRef = _.cloneDeep(movingToken);
@@ -48,6 +55,7 @@ const GameBoard = () => {
       }));
   };
 
+  // TODO: Patch bug where token cannot be clicked to place if drag action is extended outside mousedown
   const handleDragToken = async (event: any) => {
     const { over } = event;
     if (over && movingToken) {
@@ -65,8 +73,6 @@ const GameBoard = () => {
     }
   };
 
-  // TODO: Activate overflow when game board scale exceeds viewport
-  // TODO: Zoom pan pinch has some issues
   return (
     <>
       {focusedBoard && (
@@ -74,92 +80,85 @@ const GameBoard = () => {
           onDragEnd={handleDragToken}
           collisionDetection={pointerWithin}
         >
-          <TransformWrapper minScale={0.5} disabled={!_.isNull(movingToken)}>
-            <TransformComponent
-              wrapperStyle={{
-                width: '100%',
-                height: '100%',
+          <TransformComponent
+            wrapperStyle={{
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <div
+              style={{
+                width: focusedBoard.width * CELL_SIZE,
+                height: focusedBoard.height * CELL_SIZE,
               }}
+              className={`relative`}
             >
-              <div
-                style={{
-                  width: focusedBoard.width * CELL_SIZE,
-                  height: focusedBoard.height * CELL_SIZE,
-                }}
-                className={`relative`}
-              >
-                {focusedBoard?.backgroundImgURL && (
-                  <Image
-                    src={focusedBoard.backgroundImgURL}
-                    width={CELL_SIZE * focusedBoard.width}
-                    height={CELL_SIZE * focusedBoard.height}
-                    alt={`${focusedBoard.title}'s Background Image`}
-                    className="absolute w-full h-full"
-                  />
+              {focusedBoard?.backgroundImgURL && (
+                <Image
+                  src={focusedBoard.backgroundImgURL}
+                  width={CELL_SIZE * focusedBoard.width}
+                  height={CELL_SIZE * focusedBoard.height}
+                  alt={`${focusedBoard.title}'s Background Image`}
+                  className="absolute w-full h-full"
+                />
+              )}
+              {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
+              <div id="game-board" className="absolute w-full h-full">
+                {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
+                  Array.from({ length: focusedBoard.width }, (__, colIndex) => {
+                    const token = focusedBoard.activeTokens.reduce(
+                      (
+                        highestToken: ActiveGameBoardToken | null,
+                        currentToken: ActiveGameBoardToken
+                      ): ActiveGameBoardToken | null => {
+                        if (
+                          currentToken.boardPosition[0] === colIndex &&
+                          currentToken.boardPosition[1] === rowIndex &&
+                          (!highestToken ||
+                            currentToken.lastMovedAt > highestToken.lastMovedAt)
+                        ) {
+                          return currentToken;
+                        }
+                        return highestToken;
+                      },
+                      null
+                    );
+                    const movable = isUserDm || token?.ownerId === user?.uid;
+                    return (
+                      <div key={`${colIndex},${rowIndex}`}>
+                        <CellContextMenu
+                          token={token}
+                          coords={[colIndex, rowIndex]}
+                          disabled={!_.isNil(token) && !movable}
+                        >
+                          <GameBoardCell
+                            isMovingToken={!_.isNil(movingToken)}
+                            droppableId={`${colIndex},${rowIndex}`}
+                          >
+                            {token && (
+                              <ActiveGameToken
+                                onMouseDown={(event: any) => {
+                                  if (event?.button === 0 && movable) {
+                                    setMovingToken(token);
+                                  }
+                                }}
+                                onMouseUp={() => {
+                                  setMovingToken(null);
+                                }}
+                                token={token}
+                                selected={movingToken?.id === token.id}
+                                movable={movable}
+                              />
+                            )}
+                          </GameBoardCell>
+                        </CellContextMenu>
+                      </div>
+                    );
+                  })
                 )}
-                {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
-                <div id="game-board" className="absolute w-full h-full">
-                  {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
-                    Array.from(
-                      { length: focusedBoard.width },
-                      (__, colIndex) => {
-                        const token = focusedBoard.activeTokens.reduce(
-                          (
-                            highestToken: ActiveGameBoardToken | null,
-                            currentToken: ActiveGameBoardToken
-                          ): ActiveGameBoardToken | null => {
-                            if (
-                              currentToken.boardPosition[0] === colIndex &&
-                              currentToken.boardPosition[1] === rowIndex &&
-                              (!highestToken ||
-                                currentToken.lastMovedAt >
-                                  highestToken.lastMovedAt)
-                            ) {
-                              return currentToken;
-                            }
-                            return highestToken;
-                          },
-                          null
-                        );
-                        const movable =
-                          isUserDm || token?.ownerId === user?.uid;
-                        return (
-                          <div key={`${colIndex},${rowIndex}`}>
-                            <CellContextMenu
-                              token={token}
-                              coords={[colIndex, rowIndex]}
-                              disabled={!_.isNil(token) && !movable}
-                            >
-                              <GameBoardCell
-                                isMovingToken={!_.isNil(movingToken)}
-                                droppableId={`${colIndex},${rowIndex}`}
-                              >
-                                {token && (
-                                  <ActiveGameToken
-                                    onMouseDown={(event: any) => {
-                                      if (event?.button === 0 && movable) {
-                                        setMovingToken(token);
-                                      }
-                                    }}
-                                    onMouseUp={() => {
-                                      setMovingToken(null);
-                                    }}
-                                    token={token}
-                                    selected={movingToken?.id === token.id}
-                                    movable={movable}
-                                  />
-                                )}
-                              </GameBoardCell>
-                            </CellContextMenu>
-                          </div>
-                        );
-                      }
-                    )
-                  )}
-                </div>
               </div>
-            </TransformComponent>
-          </TransformWrapper>
+            </div>
+          </TransformComponent>
         </DndContext>
       )}
     </>
