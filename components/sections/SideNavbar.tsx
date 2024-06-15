@@ -43,7 +43,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-// TODO: Close sidebar when form (either gameBoard or token) is submitted
 const SideNavbar = () => {
   const { isUserDm } = useCampaign();
   const { focusedBoard } = useFocusedBoard();

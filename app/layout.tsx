@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   description: 'D&D fun time',
 };
 
-// TODO: Replace most, if not all, await statements with load()
 export default function RootLayout({ children }: { children: ReactNode }) {
+  // TODO: Replace most, if not all, await statements with load()
   return (
     <html lang="en">
       <body className={inter.className}>

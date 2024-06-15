@@ -3,7 +3,7 @@
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
 import { useEffect, useState } from 'react';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
-import { GameBoardCell } from '@/components/board/GameBoardCell';
+import GameBoardCell from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
 import ActiveGameToken from '@/components/board/ActiveGameToken';
@@ -25,7 +25,6 @@ const GameBoard = (props: { toggleBoardGestures: Function }) => {
     null
   );
 
-  // TODO: Get resetTransform() to trigger when page loads / on refresh
   // Update board css class
   useEffect(() => {
     const gameBoard = document.querySelector('#game-board');
@@ -55,7 +54,6 @@ const GameBoard = (props: { toggleBoardGestures: Function }) => {
       }));
   };
 
-  // TODO: Patch bug where token cannot be clicked to place if drag action is extended outside mousedown
   const handleDragToken = async (event: any) => {
     const { over } = event;
     if (over && movingToken) {
@@ -104,6 +102,7 @@ const GameBoard = (props: { toggleBoardGestures: Function }) => {
               )}
               {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
               <div id="game-board" className="absolute w-full h-full">
+                {/* TODO: Every cell re-renders on each user action */}
                 {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
                   Array.from({ length: focusedBoard.width }, (__, colIndex) => {
                     const token = focusedBoard.activeTokens.reduce(
@@ -144,6 +143,9 @@ const GameBoard = (props: { toggleBoardGestures: Function }) => {
                                 }}
                                 onMouseUp={() => {
                                   setMovingToken(null);
+                                }}
+                                onClick={() => {
+                                  movingToken && setMovingToken(null);
                                 }}
                                 token={token}
                                 selected={movingToken?.id === token.id}

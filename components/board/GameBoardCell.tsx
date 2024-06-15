@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { memo, ReactNode } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
 type GameBoardCellProps = {
@@ -7,7 +7,7 @@ type GameBoardCellProps = {
   children: ReactNode;
 };
 
-export const GameBoardCell = ({
+const GameBoardCell = ({
   isMovingToken,
   children,
   droppableId,
@@ -15,6 +15,8 @@ export const GameBoardCell = ({
   const { setNodeRef } = useDroppable({
     id: droppableId,
   });
+
+  console.log('re-render at id: ' + droppableId);
 
   return (
     <div
@@ -25,3 +27,4 @@ export const GameBoardCell = ({
     </div>
   );
 };
+export default memo(GameBoardCell);

@@ -19,13 +19,20 @@ import { UserSession } from '@/types/UserTypes';
 import { useUser } from '@/hooks/useUser';
 import _ from 'lodash';
 import { TransformWrapper } from 'react-zoom-pan-pinch';
+import { CELL_SIZE } from '@/app/globals';
+import { useFow } from '@/hooks/useFow';
 
+// TODO: Display campaign title as head title
 const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
   const { user } = useUser();
+  const { eraseFow } = useFow();
   const { focusedBoard } = useFocusedBoard();
 
   const [disableBoardGestures, setDisableBoardGestures] = useState(false);
+  const [initialBoardScale, setInitialBoardScale] = useState(1);
+  const [minBoardScale, setMinBoardScale] = useState(0.01);
+  const [maxBoardScale, setMaxBoardScale] = useState(2);
 
   useEffect(() => {
     setCampaignId(params.id);
@@ -59,6 +66,30 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
     }
   }, [params.id]);
 
+  // TODO: Tweak this
+  // Dynamically set game board min/max/initial scales
+  useEffect(() => {
+    if (focusedBoard) {
+      // '200' is used to add 200px of padding to the default scale as to not completely cover screen w/ board
+      const weightedWidth =
+        (window.innerWidth - 200) / (focusedBoard.width * CELL_SIZE);
+      const weightedHeight =
+        (window.innerHeight - 200) / (focusedBoard.height * CELL_SIZE);
+
+      if (weightedWidth > weightedHeight) {
+        setInitialBoardScale(weightedHeight);
+        setMinBoardScale(weightedHeight / 3);
+        setMaxBoardScale(weightedHeight * 3);
+        console.log(weightedHeight);
+      } else {
+        console.log(weightedWidth);
+        setInitialBoardScale(weightedWidth);
+        setMinBoardScale(weightedWidth / 3);
+        setMaxBoardScale(weightedWidth * 3);
+      }
+    }
+  }, [focusedBoard?.width, focusedBoard?.height]);
+
   const handleDeleteBoard = async (boardId: string) => {
     if (campaign && focusedBoard) {
       // Delete from game_boards
@@ -91,8 +122,20 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
             <div className="w-full h-full flex items-center justify-center overflow-hidden">
               {focusedBoard?.id ? (
                 <TransformWrapper
-                  minScale={0.5}
-                  disabled={disableBoardGestures}
+                  minScale={minBoardScale}
+                  maxScale={maxBoardScale}
+                  initialScale={initialBoardScale}
+                  disabled={disableBoardGestures || !_.isNull(eraseFow)}
+                  // -40px is necessary to center board because of side navbar offset (sidenav width is 80px)
+                  initialPositionX={
+                    window.innerWidth / 2 -
+                    (focusedBoard.width * CELL_SIZE) / 2 -
+                    40
+                  }
+                  initialPositionY={
+                    window.innerHeight / 2 -
+                    (focusedBoard.height * CELL_SIZE) / 2
+                  }
                 >
                   <GameBoard
                     toggleBoardGestures={(toggle: boolean) =>

@@ -29,8 +29,6 @@ export default function Campaigns() {
 
   const [campaignIds, setCampaignIds] = useState<string[]>([]);
 
-  // TODO: Figure out how to make campaign null when user enters campaign list page from campaign
-
   useEffect(() => {
     const fetchCampaignIds = async (userId: string) => {
       const docRef = doc(db, 'users', userId);

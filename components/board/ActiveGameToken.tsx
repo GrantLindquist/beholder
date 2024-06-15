@@ -13,6 +13,7 @@ const ActiveGameToken = (props: {
   movable: boolean;
   onMouseDown: (event: any) => void;
   onMouseUp: () => void;
+  onClick: () => void;
 }) => {
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: props.token.id,
@@ -25,6 +26,7 @@ const ActiveGameToken = (props: {
         className={`relative ${props.movable ? 'cursor-move' : ''} ${props.selected ? 'ring-4' : ''}`}
         onMouseDown={props.onMouseDown}
         onMouseUp={props.onMouseUp}
+        onClick={props.onClick}
         {...listeners}
         {...attributes}
       >
