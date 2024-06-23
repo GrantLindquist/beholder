@@ -30,18 +30,25 @@ const FocusedBoardContext = createContext<{
     tokenRef: ActiveGameBoardToken,
     updates: Object
   ) => Promise<void>;
+  movingToken: ActiveGameBoardToken | null;
+  setMovingToken: Function;
 }>({
   focusedBoard: null,
   toggleSetting: async () => {},
   updateToken: async () => {},
+  movingToken: null,
+  setMovingToken: () => {},
 });
 
 export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
   const { campaign, isUserDm } = useCampaign();
-
-  const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
   const { toast } = useToast();
   const { load } = useLoader();
+
+  const [focusedBoard, setFocusedBoard] = useState<GameBoardType | null>(null);
+  const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
+    null
+  );
 
   useEffect(() => {
     if (campaign?.focusedBoardId) {
@@ -119,7 +126,13 @@ export const FocusedBoardProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <FocusedBoardContext.Provider
-      value={{ focusedBoard, toggleSetting, updateToken }}
+      value={{
+        focusedBoard,
+        toggleSetting,
+        updateToken,
+        movingToken,
+        setMovingToken,
+      }}
     >
       {children}
     </FocusedBoardContext.Provider>

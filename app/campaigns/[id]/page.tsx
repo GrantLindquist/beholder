@@ -27,7 +27,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
   const { campaign, setCampaignId } = useCampaign();
   const { user } = useUser();
   const { eraseFow } = useFow();
-  const { focusedBoard } = useFocusedBoard();
+  const { focusedBoard, movingToken } = useFocusedBoard();
 
   const [disableBoardGestures, setDisableBoardGestures] = useState(false);
   const [initialBoardScale, setInitialBoardScale] = useState(1);
@@ -90,6 +90,12 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
     }
   }, [focusedBoard?.width, focusedBoard?.height]);
 
+  useEffect(() => {
+    const gestureToggle = !_.isNull(movingToken);
+    disableBoardGestures !== gestureToggle &&
+      setDisableBoardGestures(gestureToggle);
+  }, [movingToken]);
+
   const handleDeleteBoard = async (boardId: string) => {
     if (campaign && focusedBoard) {
       // Delete from game_boards
@@ -137,11 +143,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                     (focusedBoard.height * CELL_SIZE) / 2
                   }
                 >
-                  <GameBoard
-                    toggleBoardGestures={(toggle: boolean) =>
-                      setDisableBoardGestures(toggle)
-                    }
-                  />
+                  <GameBoard />
                 </TransformWrapper>
               ) : (
                 <p>There are no active boards for this campaign.</p>

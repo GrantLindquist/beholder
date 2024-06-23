@@ -12,11 +12,12 @@ import { CELL_SIZE } from '@/app/globals';
 const FogOfWar = () => {
   const { focusedBoard } = useFocusedBoard();
   const { isUserDm } = useCampaign();
-  const { eraseFow } = useFow();
+  const { eraseFow, setEraseFow } = useFow();
 
   const [mouseDown, setMouseDown] = useState(false);
 
   useEffect(() => {
+    setEraseFow(null);
     const fogOfWar = document.querySelector('#fog-of-war');
     if (fogOfWar && focusedBoard) {
       const columns = `repeat(${focusedBoard.width}, minmax(${CELL_SIZE}px, ${CELL_SIZE}px))`;
@@ -26,7 +27,7 @@ const FogOfWar = () => {
       // @ts-ignore
       fogOfWar.style.gridTemplateRows = rows;
     }
-  }, [focusedBoard?.width]);
+  }, [focusedBoard?.width, focusedBoard?.height]);
 
   const handleUpdateFow = async (
     erase: boolean,

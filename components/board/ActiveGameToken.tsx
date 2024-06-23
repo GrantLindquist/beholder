@@ -1,7 +1,6 @@
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
 import Image from 'next/image';
 import DEFAULT_AVATAR from '@/public/assets/default_token.jpg';
-import { useDraggable } from '@dnd-kit/core';
 import { CELL_SIZE } from '@/app/globals';
 import _ from 'lodash';
 import ConditionBadge from '@/components/board/ConditionBadge';
@@ -12,23 +11,12 @@ const ActiveGameToken = (props: {
   selected?: boolean;
   movable: boolean;
   onMouseDown: (event: any) => void;
-  onMouseUp: () => void;
-  onClick: () => void;
 }) => {
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: props.token.id,
-  });
-
   return (
     <>
       <div
-        ref={setNodeRef}
         className={`relative ${props.movable ? 'cursor-move' : ''} ${props.selected ? 'ring-4' : ''}`}
         onMouseDown={props.onMouseDown}
-        onMouseUp={props.onMouseUp}
-        onClick={props.onClick}
-        {...listeners}
-        {...attributes}
       >
         {props.token.dead ? (
           <DeathBadge />

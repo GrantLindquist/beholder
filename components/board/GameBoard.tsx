@@ -1,8 +1,7 @@
 'use client';
 
 import { ActiveGameBoardToken } from '@/types/GameBoardTypes';
-import { useEffect, useState } from 'react';
-import { DndContext, pointerWithin } from '@dnd-kit/core';
+import { memo, useEffect } from 'react';
 import GameBoardCell from '@/components/board/GameBoardCell';
 import { CELL_SIZE } from '@/app/globals';
 import Image from 'next/image';
@@ -15,15 +14,11 @@ import { useUser } from '@/hooks/useUser';
 import { useCampaign } from '@/hooks/useCampaign';
 import { TransformComponent, useControls } from 'react-zoom-pan-pinch';
 
-const GameBoard = (props: { toggleBoardGestures: Function }) => {
-  const { focusedBoard, updateToken } = useFocusedBoard();
+const GameBoard = () => {
+  const { focusedBoard } = useFocusedBoard();
   const { isUserDm } = useCampaign();
   const { user } = useUser();
   const { resetTransform } = useControls();
-
-  const [movingToken, setMovingToken] = useState<ActiveGameBoardToken | null>(
-    null
-  );
 
   // Update board css class
   useEffect(() => {
@@ -39,131 +34,137 @@ const GameBoard = (props: { toggleBoardGestures: Function }) => {
     resetTransform();
   }, [focusedBoard?.width, focusedBoard?.height]);
 
-  useEffect(() => {
-    props.toggleBoardGestures(movingToken);
-  }, [movingToken]);
-
-  const moveToken = async (coords: [number, number]) => {
-    const movingTokenRef = _.cloneDeep(movingToken);
-    setMovingToken(null);
-
-    movingTokenRef &&
-      (await updateToken(movingTokenRef, {
-        boardPosition: coords,
-        lastMovedAt: Date.now(),
-      }));
-  };
-
-  const handleDragToken = async (event: any) => {
-    const { over } = event;
-    if (over && movingToken) {
-      const coords: [number, number] = over.id
-        .split(',')
-        .map((coord: string) => parseInt(coord, 10));
-      if (
-        coords[0] !== movingToken.boardPosition[0] ||
-        coords[1] !== movingToken.boardPosition[1]
-      ) {
-        await moveToken(coords);
-      }
-    } else {
-      setMovingToken(null);
-    }
-  };
-
+  // TODO: Make sure that dragging logic makes sense, i was tired when i re-wrote it
+  // TODO: Disable entire board from re-rendering when token is picked up and placed
   return (
     <>
       {focusedBoard && (
-        <DndContext
-          onDragEnd={handleDragToken}
-          collisionDetection={pointerWithin}
+        <TransformComponent
+          wrapperStyle={{
+            width: '100%',
+            height: '100%',
+          }}
         >
-          <TransformComponent
-            wrapperStyle={{
-              width: '100%',
-              height: '100%',
+          <div
+            style={{
+              width: focusedBoard.width * CELL_SIZE,
+              height: focusedBoard.height * CELL_SIZE,
             }}
+            className={`relative`}
           >
-            <div
-              style={{
-                width: focusedBoard.width * CELL_SIZE,
-                height: focusedBoard.height * CELL_SIZE,
-              }}
-              className={`relative`}
-            >
-              {focusedBoard?.backgroundImgURL && (
-                <Image
-                  src={focusedBoard.backgroundImgURL}
-                  width={CELL_SIZE * focusedBoard.width}
-                  height={CELL_SIZE * focusedBoard.height}
-                  alt={`${focusedBoard.title}'s Background Image`}
-                  className="absolute w-full h-full"
-                />
+            {focusedBoard?.backgroundImgURL && (
+              <Image
+                src={focusedBoard.backgroundImgURL}
+                width={CELL_SIZE * focusedBoard.width}
+                height={CELL_SIZE * focusedBoard.height}
+                alt={`${focusedBoard.title}'s Background Image`}
+                className="absolute w-full h-full"
+              />
+            )}
+            {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
+            <div id="game-board" className="absolute w-full h-full">
+              {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
+                Array.from({ length: focusedBoard.width }, (__, colIndex) => {
+                  const token = focusedBoard.activeTokens.reduce(
+                    (
+                      highestToken: ActiveGameBoardToken | null,
+                      currentToken: ActiveGameBoardToken
+                    ): ActiveGameBoardToken | null => {
+                      if (
+                        currentToken.boardPosition[0] === colIndex &&
+                        currentToken.boardPosition[1] === rowIndex &&
+                        (!highestToken ||
+                          currentToken.lastMovedAt > highestToken.lastMovedAt)
+                      ) {
+                        return currentToken;
+                      }
+                      return highestToken;
+                    },
+                    null
+                  );
+                  const movable = isUserDm || token?.ownerId === user?.uid;
+                  return (
+                    <CellGroupMemo
+                      key={`${colIndex},${rowIndex}`}
+                      colIndex={colIndex}
+                      rowIndex={rowIndex}
+                      token={token}
+                      movable={movable}
+                    />
+                  );
+                })
               )}
-              {focusedBoard?.settings?.fowEnabled && <FogOfWar />}
-              <div id="game-board" className="absolute w-full h-full">
-                {/* TODO: Every cell re-renders on each user action */}
-                {Array.from({ length: focusedBoard.height }, (__, rowIndex) =>
-                  Array.from({ length: focusedBoard.width }, (__, colIndex) => {
-                    const token = focusedBoard.activeTokens.reduce(
-                      (
-                        highestToken: ActiveGameBoardToken | null,
-                        currentToken: ActiveGameBoardToken
-                      ): ActiveGameBoardToken | null => {
-                        if (
-                          currentToken.boardPosition[0] === colIndex &&
-                          currentToken.boardPosition[1] === rowIndex &&
-                          (!highestToken ||
-                            currentToken.lastMovedAt > highestToken.lastMovedAt)
-                        ) {
-                          return currentToken;
-                        }
-                        return highestToken;
-                      },
-                      null
-                    );
-                    const movable = isUserDm || token?.ownerId === user?.uid;
-                    return (
-                      <div key={`${colIndex},${rowIndex}`}>
-                        <CellContextMenu
-                          token={token}
-                          coords={[colIndex, rowIndex]}
-                          disabled={!_.isNil(token) && !movable}
-                        >
-                          <GameBoardCell
-                            isMovingToken={!_.isNil(movingToken)}
-                            droppableId={`${colIndex},${rowIndex}`}
-                          >
-                            {token && (
-                              <ActiveGameToken
-                                onMouseDown={(event: any) => {
-                                  if (event?.button === 0 && movable) {
-                                    setMovingToken(token);
-                                  }
-                                }}
-                                onMouseUp={() => {
-                                  setMovingToken(null);
-                                }}
-                                onClick={() => {
-                                  movingToken && setMovingToken(null);
-                                }}
-                                token={token}
-                                selected={movingToken?.id === token.id}
-                                movable={movable}
-                              />
-                            )}
-                          </GameBoardCell>
-                        </CellContextMenu>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
             </div>
-          </TransformComponent>
-        </DndContext>
+          </div>
+        </TransformComponent>
       )}
     </>
   );
 };
 export default GameBoard;
+
+const GameBoardCellGroup = (props: {
+  colIndex: number;
+  rowIndex: number;
+  token: ActiveGameBoardToken | null;
+  movable: boolean;
+}) => {
+  const { updateToken, movingToken, setMovingToken } = useFocusedBoard();
+
+  const handleDragToken = async (
+    token: ActiveGameBoardToken,
+    coords: [number, number]
+  ) => {
+    if (
+      coords[0] !== token.boardPosition[0] ||
+      coords[1] !== token.boardPosition[1]
+    ) {
+      setMovingToken(null);
+
+      token &&
+        (await updateToken(token, {
+          boardPosition: coords,
+          lastMovedAt: Date.now(),
+        }));
+    }
+  };
+
+  return (
+    <div key={`${props.colIndex},${props.rowIndex}`}>
+      <CellContextMenu
+        token={props.token}
+        coords={[props.colIndex, props.rowIndex]}
+        disabled={!_.isNil(props.token) && !props.movable}
+      >
+        <GameBoardCell
+          onMouseUp={() => {
+            movingToken &&
+              handleDragToken(movingToken, [props.colIndex, props.rowIndex]);
+          }}
+          onClick={() => {
+            movingToken &&
+              handleDragToken(movingToken, [props.colIndex, props.rowIndex]);
+          }}
+        >
+          {props.token && (
+            <ActiveGameToken
+              onMouseDown={(event: any) => {
+                if (event?.button === 0 && props.movable) {
+                  setMovingToken(props.token);
+                }
+              }}
+              token={props.token}
+              selected={movingToken?.id === props.token.id}
+              movable={props.movable}
+            />
+          )}
+        </GameBoardCell>
+      </CellContextMenu>
+    </div>
+  );
+};
+
+const CellGroupMemo = memo(GameBoardCellGroup, (prevProps, nextProps) => {
+  // @ts-ignore
+  return prevProps.token?.id === nextProps.token?.id;
+});

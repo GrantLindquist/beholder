@@ -1,30 +1,26 @@
-import { memo, ReactNode } from 'react';
-import { useDroppable } from '@dnd-kit/core';
+import { ReactNode } from 'react';
+import { useFocusedBoard } from '@/hooks/useFocusedBoard';
 
 type GameBoardCellProps = {
-  isMovingToken: boolean;
-  droppableId: string;
+  onMouseUp: () => void;
+  onClick: () => void;
   children: ReactNode;
 };
 
 const GameBoardCell = ({
-  isMovingToken,
   children,
-  droppableId,
+  onMouseUp,
+  onClick,
 }: GameBoardCellProps) => {
-  const { setNodeRef } = useDroppable({
-    id: droppableId,
-  });
-
-  console.log('re-render at id: ' + droppableId);
-
+  const { movingToken } = useFocusedBoard();
   return (
     <div
-      ref={setNodeRef}
-      className={`size-full border border-white border-opacity-20 ${isMovingToken && 'hover:bg-white hover:bg-opacity-20'}`}
+      className={`size-full border border-white border-opacity-20 ${movingToken && 'hover:bg-white hover:bg-opacity-20'}`}
+      onMouseUp={onMouseUp}
+      onClick={onClick}
     >
       {children}
     </div>
   );
 };
-export default memo(GameBoardCell);
+export default GameBoardCell;
